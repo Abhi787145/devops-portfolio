@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Abhishek Sharma - DevOps Engineer Portfolio. Specializing in Cloud Infrastructure (Azure, AWS), Containerization (Docker, Kubernetes), CI/CD, and IaC (Terraform).">
+    <meta name="keywords" content="Abhishek Sharma, DevOps, Engineer, Portfolio, Resume, Cloud, Azure, AWS, Terraform, Kubernetes, Docker, CI/CD, Jenkins, SQL Server">
+    <title>Abhishek Sharma | DevOps Engineer Portfolio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Canvas for Particle Network Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="logo">
+                <span class="terminal-symbol">&lt;</span>asharma<span class="terminal-symbol"> /&gt;</span>
+            </a>
+            <nav class="nav-menu">
+                <a href="#profile" class="nav-link active">Profile</a>
+                <a href="#terminal-section" class="nav-link">Console</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#certifications" class="nav-link">Certifications</a>
+                <a href="#contact" class="nav-link contact-btn-nav">Contact</a>
+            </nav>
+            <button class="mobile-toggle" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="profile" class="hero-section">
+            <div class="hero-content">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Available for Opportunities</span>
+                </div>
+                <h1 class="hero-title">Abhishek Sharma</h1>
+                <h2 class="hero-subtitle">DevOps Engineer</h2>
+                <p class="hero-description">
+                    Hands-on experience in cloud infrastructure optimization, application deployment, and proactive system monitoring across AWS and Azure environments. Expert in automating containerized workloads, CI/CD pipelines, and infrastructure as code.
+                </p>
+                <div class="hero-ctas">
+                    <a href="#pipeline-section" class="btn btn-primary"><i class="fa-solid fa-play"></i> Trigger Pipeline</a>
+                    <a href="#projects" class="btn btn-secondary"><i class="fa-solid fa-diagram-project"></i> View Architecture</a>
+                </div>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/as787145" target="_blank" rel="noopener noreferrer" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="mailto:as787145@gmail.com" title="Email"><i class="fa-regular fa-envelope"></i></a>
+                    <a href="tel:+918308989160" title="Phone"><i class="fa-solid fa-phone"></i></a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-globe"></div>
+                <div class="visual-ring ring-1"></div>
+                <div class="visual-ring ring-2"></div>
+                <div class="visual-ring ring-3"></div>
+                <div class="tech-stack-floater fs-docker" title="Docker"><i class="fa-brands fa-docker"></i></div>
+                <div class="tech-stack-floater fs-aws" title="AWS"><i class="fa-brands fa-aws"></i></div>
+                <div class="tech-stack-floater fs-github" title="GitHub"><i class="fa-brands fa-github"></i></div>
+                <div class="tech-stack-floater fs-terminal" title="Terraform"><i class="fa-solid fa-code"></i></div>
+            </div>
+        </section>
+
+        <!-- Interactive Terminal Console Section -->
+        <section id="terminal-section" class="terminal-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Terminal CLI</span>
+                <h3 class="section-title-neon">Interactive Command Console</h3>
+                <p class="section-subtitle">Type commands directly or click the pre-sets below to query the system database about Abhishek.</p>
+            </div>
+            
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="window-controls">
+                        <span class="control-dot dot-close"></span>
+                        <span class="control-dot dot-minimize"></span>
+                        <span class="control-dot dot-expand"></span>
+                    </div>
+                    <span class="terminal-title"><i class="fa-solid fa-terminal"></i> abhishek@devops-node: ~</span>
+                    <span class="terminal-ip">127.0.0.1</span>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="terminal-line text-system">System initialization completed. Type 'help' to see list of available commands.</div>
+                    <div class="terminal-line text-system">Guest session active as visitor-prod-1.</div>
+                    <div class="terminal-line"><span class="prompt">guest@devops-node:~$</span> <span class="typed-command">cat welcome.txt</span></div>
+                    <div class="terminal-output">
+Hi! I'm Abhishek. I build stable environments, automate tedious processes, and keep services highly available. Use the GUI or this terminal to explore my profile.
+                    </div>
+                </div>
+                <div class="terminal-input-area">
+                    <span class="prompt">guest@devops-node:~$</span>
+                    <input type="text" id="terminal-input" autocomplete="off" autofocus placeholder="Type a command...">
+                </div>
+            </div>
+            
+            <div class="terminal-presets">
+                <button class="preset-btn" data-cmd="help"><i class="fa-solid fa-question"></i> help</button>
+                <button class="preset-btn" data-cmd="whoami"><i class="fa-solid fa-user"></i> whoami</button>
+                <button class="preset-btn" data-cmd="skills"><i class="fa-solid fa-cube"></i> skills</button>
+                <button class="preset-btn" data-cmd="projects"><i class="fa-solid fa-folder-open"></i> projects</button>
+                <button class="preset-btn" data-cmd="experience"><i class="fa-solid fa-briefcase"></i> experience</button>
+                <button class="preset-btn" data-cmd="certifications"><i class="fa-solid fa-award"></i> certifications</button>
+                <button class="preset-btn" data-cmd="clear"><i class="fa-solid fa-trash-can"></i> clear</button>
+            </div>
+        </section>
+
+        <!-- DevOps CI/CD Pipeline Simulator Section -->
+        <section id="pipeline-section" class="pipeline-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Automation Workflow</span>
+                <h3 class="section-title-neon">DevOps CI/CD Pipeline Simulator</h3>
+                <p class="section-subtitle">Simulate a live Git push and watch the automated deployment process run in real time.</p>
+            </div>
+
+            <div class="pipeline-card">
+                <div class="pipeline-controls">
+                    <button class="pipeline-btn" id="run-pipeline-btn">
+                        <span class="btn-icon"><i class="fa-solid fa-play"></i></span>
+                        <span class="btn-text">Run Build & Deploy Pipeline</span>
+                    </button>
+                    <div class="pipeline-status-indicator">
+                        Status: <span id="pipeline-status-text" class="status-idle">IDLE</span>
+                    </div>
+                </div>
+
+                <div class="pipeline-flow">
+                    <!-- Stage 1 -->
+                    <div class="pipeline-stage" id="stage-source">
+                        <div class="stage-icon"><i class="fa-solid fa-code-commit"></i></div>
+                        <div class="stage-name">1. Code Push</div>
+                        <div class="stage-status">Pending</div>
+                        <div class="progress-bar-small"><div class="progress-fill"></div></div>
+                    </div>
+                    
+                    <div class="pipeline-connector">
+                        <div class="connector-line"></div>
+                    </div>
+                    
+                    <!-- Stage 2 -->
+                    <div class="pipeline-stage" id="stage-build">
+                        <div class="stage-icon"><i class="fa-brands fa-docker"></i></div>
+                        <div class="stage-name">2. Docker Build</div>
+                        <div class="stage-status">Pending</div>
+                        <div class="progress-bar-small"><div class="progress-fill"></div></div>
+                    </div>
+                    
+                    <div class="pipeline-connector">
+                        <div class="connector-line"></div>
+                    </div>
+                    
+                    <!-- Stage 3 -->
+                    <div class="pipeline-stage" id="stage-test">
+                        <div class="stage-icon"><i class="fa-solid fa-vial-circle-check"></i></div>
+                        <div class="stage-name">3. Scan & Test</div>
+                        <div class="stage-status">Pending</div>
+                        <div class="progress-bar-small"><div class="progress-fill"></div></div>
+                    </div>
+                    
+                    <div class="pipeline-connector">
+                        <div class="connector-line"></div>
+                    </div>
+                    
+                    <!-- Stage 4 -->
+                    <div class="pipeline-stage" id="stage-deploy">
+                        <div class="stage-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div class="stage-name">4. K8s Deploy</div>
+                        <div class="stage-status">Pending</div>
+                        <div class="progress-bar-small"><div class="progress-fill"></div></div>
+                    </div>
+                </div>
+
+                <!-- Live Logs output console -->
+                <div class="pipeline-logs-container">
+                    <div class="logs-header">
+                        <span><i class="fa-solid fa-file-invoice"></i> Runner Console Log</span>
+                        <span class="logs-clear" id="clear-logs-btn">Clear Logs</span>
+                    </div>
+                    <div class="logs-body" id="pipeline-logs">
+                        <div class="log-line text-muted">[System] Ready to run build task. Waiting for user action...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="skills-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Core Competencies</span>
+                <h3 class="section-title-neon">Technical Ecosystem</h3>
+                <p class="section-subtitle">A catalog of tools, services, and languages I use to deploy and manage production environments.</p>
+            </div>
+
+            <div class="skills-grid">
+                <!-- Skill Category: AWS -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-brands fa-aws category-icon aws-color"></i>
+                        <h4>Amazon Web Services</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="90">EC2</span>
+                        <span class="skill-badge" data-level="85">VPC</span>
+                        <span class="skill-badge" data-level="80">S3</span>
+                        <span class="skill-badge" data-level="75">Lambda</span>
+                        <span class="skill-badge" data-level="85">IAM</span>
+                        <span class="skill-badge" data-level="85">Load Balancers</span>
+                        <span class="skill-badge" data-level="80">Security Groups</span>
+                        <span class="skill-badge" data-level="75">CloudWatch</span>
+                    </div>
+                </div>
+
+                <!-- Skill Category: Azure -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-brands fa-microsoft category-icon azure-color"></i>
+                        <h4>Microsoft Azure</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="85">VM (Virtual Machines)</span>
+                        <span class="skill-badge" data-level="80">App Services</span>
+                        <span class="skill-badge" data-level="85">SQL Servers & Elastic Pool</span>
+                        <span class="skill-badge" data-level="75">Key Vault</span>
+                        <span class="skill-badge" data-level="80">Blob Storage</span>
+                        <span class="skill-badge" data-level="80">Storage Accounts</span>
+                        <span class="skill-badge" data-level="75">Azure Alerts</span>
+                    </div>
+                </div>
+
+                <!-- Skill Category: Infrastructure & CI/CD -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-solid fa-gears category-icon devops-color"></i>
+                        <h4>Infrastructure & CI/CD</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="90">Terraform (IaC)</span>
+                        <span class="skill-badge" data-level="85">Kubernetes</span>
+                        <span class="skill-badge" data-level="85">Docker</span>
+                        <span class="skill-badge" data-level="80">Jenkins</span>
+                        <span class="skill-badge" data-level="85">Azure DevOps</span>
+                        <span class="skill-badge" data-level="85">Git / GitHub</span>
+                    </div>
+                </div>
+
+                <!-- Skill Category: DB & Servers -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-solid fa-database category-icon db-color"></i>
+                        <h4>Databases & Administration</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="85">SQL Server Administration</span>
+                        <span class="skill-badge" data-level="80">SSMS</span>
+                        <span class="skill-badge" data-level="75">Redgate</span>
+                        <span class="skill-badge" data-level="80">IIS</span>
+                        <span class="skill-badge" data-level="70">PGAdmin</span>
+                        <span class="skill-badge" data-level="70">MongoDB Compass</span>
+                    </div>
+                </div>
+
+                <!-- Skill Category: Languages & Dev -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-solid fa-code category-icon lang-color"></i>
+                        <h4>Languages & Frameworks</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="80">Python</span>
+                        <span class="skill-badge" data-level="70">C / C++</span>
+                        <span class="skill-badge" data-level="70">.NET</span>
+                        <span class="skill-badge" data-level="65">Django</span>
+                    </div>
+                </div>
+
+                <!-- Skill Category: AI & Tools -->
+                <div class="skill-category-card">
+                    <div class="category-header">
+                        <i class="fa-solid fa-brain category-icon ai-color"></i>
+                        <h4>AI, Monitoring & ITSM</h4>
+                    </div>
+                    <div class="skill-tags">
+                        <span class="skill-badge" data-level="90">Prompting & AI Brainstorming</span>
+                        <span class="skill-badge" data-level="80">SIEM Tools</span>
+                        <span class="skill-badge" data-level="75">GLPI (Ticketing Tool)</span>
+                        <span class="skill-badge" data-level="75">ITIL Processes</span>
+                        <span class="skill-badge" data-level="85">System Troubleshooting</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="experience-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Professional Milestones</span>
+                <h3 class="section-title-neon">Work Experience</h3>
+                <p class="section-subtitle">My career history and achievements as a deployment specialist.</p>
+            </div>
+
+            <div class="timeline">
+                <!-- Job Entry -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">01/2023 - Present</div>
+                    <div class="timeline-content glass-card">
+                        <div class="job-header">
+                            <div>
+                                <h4 class="job-title">Associate Application Deployment Engineer</h4>
+                                <h5 class="job-company">Simplify Healthcare</h5>
+                            </div>
+                            <span class="job-location"><i class="fa-solid fa-location-dot"></i> Pune, Maharashtra</span>
+                        </div>
+                        <p class="job-project-tag"><strong>Project:</strong> Multi Project Environment</p>
+                        <ul class="job-achievements">
+                            <li><i class="fa-solid fa-caret-right"></i> Deployed and managed containerized applications using <strong>Docker</strong> and <strong>Kubernetes</strong>.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Maintained and deployed applications on <strong>Azure App Services</strong> and managed Storage Accounts.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Administered SQL Server databases, executing backups, Bacpac creations, and SQL scripts using <strong>SSMS</strong>, PGAdmin, and MongoDB Compass.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Monitored CPU, disk space, and memory utilization, configuring proactive incident resolution through <strong>Azure Alerts</strong> and <strong>SIEM</strong> tools.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Executed daily deployments and monitored automated jobs for reliability and performance.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Applied strong troubleshooting and problem-solving skills across CI/CD pipelines and cloud environments.</li>
+                            <li><i class="fa-solid fa-caret-right"></i> Collaborated on SDLC processes to ensure smooth development, deployment, and operational stability.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects & Interactive Infrastructure Map Section -->
+        <section id="projects" class="projects-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Featured Projects</span>
+                <h3 class="section-title-neon">Infrastructure Showcase</h3>
+                <p class="section-subtitle">Interactive visual diagram of a production-grade infrastructure architecture deployed via code.</p>
+            </div>
+
+            <div class="project-details-grid">
+                <!-- Info block -->
+                <div class="project-meta-card glass-card">
+                    <div class="project-meta-badge">AWS + Terraform</div>
+                    <h4 class="project-title-large">Drop Shipping Infrastructure</h4>
+                    <p class="project-summary-text">
+                        A highly available, secured, and scalable cloud architecture provisioned from scratch. Automated through Infrastructure as Code (IaC) to construct a complete, repeatable e-commerce backend platform.
+                    </p>
+                    <div class="project-key-stats">
+                        <div class="stat-box">
+                            <span class="stat-num">40+</span>
+                            <span class="stat-label">AWS Services</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num">100%</span>
+                            <span class="stat-label">Terraform IaC</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num">High</span>
+                            <span class="stat-label">Availability</span>
+                        </div>
+                    </div>
+                    <div class="infra-instruction">
+                        <i class="fa-solid fa-circle-info"></i> Click on any component in the interactive architecture graph to view its deployment specs.
+                    </div>
+                </div>
+
+                <!-- Interactive Map Canvas/Container -->
+                <div class="infra-diagram-container glass-card">
+                    <div class="diagram-canvas">
+                        <!-- Cloud border -->
+                        <div class="diagram-boundary" id="aws-cloud-boundary">
+                            <span class="boundary-label">AWS Cloud Region</span>
+                            
+                            <!-- VPC border -->
+                            <div class="diagram-boundary" id="vpc-boundary">
+                                <span class="boundary-label">VPC (10.0.0.0/16)</span>
+
+                                <!-- Load balancer node -->
+                                <div class="infra-node active-node" id="node-alb" data-title="Application Load Balancer (ALB)" data-desc="Elastic Load Balancer routing client traffic across multiple availability zones to EC2 web servers. Implements TLS termination and health check endpoints.">
+                                    <div class="node-icon"><i class="fa-solid fa-shuffle"></i></div>
+                                    <span class="node-label">ALB</span>
+                                </div>
+
+                                <!-- Public Subnet -->
+                                <div class="subnet-container">
+                                    <span class="subnet-label">Public Subnets</span>
+                                    <!-- EC2 Web App -->
+                                    <div class="infra-node" id="node-ec2" data-title="EC2 Auto Scaling Groups" data-desc="Web and app hosting servers deployed inside Auto Scaling groups across multiple availability zones. Instances automatically scale up/down based on CPU usage.">
+                                        <div class="node-icon"><i class="fa-solid fa-server"></i></div>
+                                        <span class="node-label">EC2 Instances</span>
+                                    </div>
+                                </div>
+
+                                <!-- Private Subnet -->
+                                <div class="subnet-container private-subnet">
+                                    <span class="subnet-label">Private Subnets</span>
+                                    <!-- RDS database -->
+                                    <div class="infra-node" id="node-rds" data-title="RDS Multi-AZ Database" data-desc="Relational Database Service hosting production data with automated backups, snapshots, and Multi-AZ replication enabled for disaster recovery.">
+                                        <div class="node-icon"><i class="fa-solid fa-database"></i></div>
+                                        <span class="node-label">RDS (SQL)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- S3 Storage (Outside VPC) -->
+                            <div class="infra-node" id="node-s3" data-title="Amazon S3 Bucket" data-desc="Secure, scalable object storage containing static web assets and backups. Configured with strict IAM access policies and lifecycle rules.">
+                                <div class="node-icon"><i class="fa-solid fa-box-archive"></i></div>
+                                <span class="node-label">S3 Bucket</span>
+                            </div>
+
+                            <!-- CloudWatch (Outside VPC) -->
+                            <div class="infra-node" id="node-cw" data-title="Amazon CloudWatch" data-desc="Provides monitoring dashboards and alarms for infrastructure utilization metrics (CPU, memory, read/write IOPS) to enable proactive scaling.">
+                                <div class="node-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <span class="node-label">CloudWatch</span>
+                            </div>
+                        </div>
+
+                        <!-- User traffic client -->
+                        <div class="infra-node" id="node-client">
+                            <div class="node-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                            <span class="node-label">Web Client</span>
+                        </div>
+
+                        <!-- Connectivity SVG Lines -->
+                        <svg class="diagram-lines">
+                            <!-- client -> alb -->
+                            <line class="anim-flow-line" x1="5%" y1="50%" x2="25%" y2="50%" id="line-client-alb"></line>
+                            <!-- alb -> ec2 -->
+                            <line class="anim-flow-line" x1="33%" y1="50%" x2="50%" y2="35%" id="line-alb-ec2"></line>
+                            <!-- ec2 -> rds -->
+                            <line class="anim-flow-line" x1="58%" y1="35%" x2="75%" y2="55%" id="line-ec2-rds"></line>
+                            <!-- ec2 -> s3 -->
+                            <line class="flow-line" x1="58%" y1="28%" x2="85%" y2="18%" id="line-ec2-s3"></line>
+                            <!-- cw -> elements -->
+                            <line class="flow-line dash-line" x1="85%" y1="80%" x2="58%" y2="35%" id="line-cw-ec2"></line>
+                        </svg>
+                    </div>
+
+                    <!-- Diagram Details Panel -->
+                    <div class="diagram-details-panel" id="diagram-details">
+                        <h5 class="detail-node-title">Application Load Balancer (ALB)</h5>
+                        <p class="detail-node-desc">Elastic Load Balancer routing client traffic across multiple availability zones to EC2 web servers. Implements TLS termination and health check endpoints.</p>
+                        <div class="terraform-snippet">
+                            <span class="tf-title"><i class="fa-solid fa-code"></i> Terraform Snippet</span>
+                            <pre><code id="terraform-code">resource "aws_lb" "web_alb" {
+  name               = "dropshipping-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = [for s in aws_subnet.public : s.id]
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bullet points of the project achievements -->
+            <div class="project-bullets-card glass-card">
+                <div class="bullets-grid">
+                    <div class="bullet-item">
+                        <div class="bullet-num">01</div>
+                        <div class="bullet-text">
+                            <strong>40+ AWS Services Orchestrated</strong>
+                            Provisioned EC2 instances, RDS databases, S3 storage, custom VPC subnet networking, Security Groups, IAM roles, and CloudWatch alarms.
+                        </div>
+                    </div>
+                    <div class="bullet-item">
+                        <div class="bullet-num">02</div>
+                        <div class="bullet-text">
+                            <strong>Modular IaC with Terraform</strong>
+                            Developed structured, reusable, and modular Terraform scripts to prevent configuration drift and enable seamless multi-region deployments.
+                        </div>
+                    </div>
+                    <div class="bullet-item">
+                        <div class="bullet-num">03</div>
+                        <div class="bullet-text">
+                            <strong>High-Availability Architecture</strong>
+                            Configured subnets across multiple availability zones connected to a network load balancer, ensuring high fault tolerance.
+                        </div>
+                    </div>
+                    <div class="bullet-item">
+                        <div class="bullet-num">04</div>
+                        <div class="bullet-text">
+                            <strong>Troubleshooting & Cost Optimization</strong>
+                            Resolved regions mismatches, configured pricing tier parameters to minimize test environment cost, and established secure Elastic IPs.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications & Education Section -->
+        <section id="certifications" class="certifications-section container">
+            <div class="grid-two-columns">
+                <!-- Certifications block -->
+                <div class="certifications-block">
+                    <div class="section-header-left">
+                        <span class="section-tag">// Validation & Badges</span>
+                        <h3 class="section-title-neon">Certifications</h3>
+                    </div>
+                    <div class="cert-list">
+                        <!-- Cert Item 1 -->
+                        <div class="cert-card glass-card">
+                            <div class="cert-icon"><i class="fa-solid fa-robot"></i></div>
+                            <div class="cert-info">
+                                <h4 class="cert-name">Generative AI Foundation</h4>
+                                <p class="cert-org">upGrad — Microsoft</p>
+                                <span class="cert-date">Issued: June 2025</span>
+                            </div>
+                        </div>
+
+                        <!-- Cert Item 2 -->
+                        <div class="cert-card glass-card">
+                            <div class="cert-icon"><i class="fa-brands fa-microsoft"></i></div>
+                            <div class="cert-info">
+                                <h4 class="cert-name">Microsoft Azure Fundamentals (AZ-900)</h4>
+                                <p class="cert-org">Microsoft</p>
+                                <span class="cert-date">Issued: October 2025</span>
+                            </div>
+                        </div>
+
+                        <!-- Cert Item 3 -->
+                        <div class="cert-card glass-card">
+                            <div class="cert-icon"><i class="fa-solid fa-cloud"></i></div>
+                            <div class="cert-info">
+                                <h4 class="cert-name">AWS Certification</h4>
+                                <p class="cert-org">Cloud&DevOpsHUB</p>
+                                <span class="cert-date">Issued: March 2026</span>
+                            </div>
+                        </div>
+
+                        <!-- Cert Item 4 -->
+                        <div class="cert-card glass-card">
+                            <div class="cert-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div class="cert-info">
+                                <h4 class="cert-name">Introduction to Cyber Security Tools and Cyber Attacks</h4>
+                                <p class="cert-org">Coursera</p>
+                                <span class="cert-date">Issued: Aug. 2020</span>
+                            </div>
+                        </div>
+
+                        <!-- Cert Item 5 -->
+                        <div class="cert-card glass-card">
+                            <div class="cert-icon"><i class="fa-solid fa-network-wired"></i></div>
+                            <div class="cert-info">
+                                <h4 class="cert-name">MNA + CloudV2</h4>
+                                <p class="cert-org">Jetking</p>
+                                <span class="cert-date">Issued: Jun. 2019</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education block -->
+                <div class="education-block">
+                    <div class="section-header-left">
+                        <span class="section-tag">// Academic Foundation</span>
+                        <h3 class="section-title-neon">Education</h3>
+                    </div>
+                    
+                    <div class="education-card-container">
+                        <div class="education-card glass-card">
+                            <div class="edu-header">
+                                <h4 class="edu-degree">Bachelor of Engineering in Information Technology</h4>
+                                <span class="edu-duration">2020 - 2024</span>
+                            </div>
+                            <h5 class="edu-institute">Pune Vidyarthi Griha's College of Engineering & S. S. Dhamankar Institute of Management</h5>
+                            <div class="edu-meta">
+                                <div class="edu-gpa">
+                                    <span class="gpa-val">8.63</span>
+                                    <span class="gpa-label">CGPA</span>
+                                </div>
+                                <p class="edu-desc">Core coursework in Database Management Systems, System Architecture, Networks, Web Tech, and Software Engineering methodologies.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section container">
+            <div class="section-header-center">
+                <span class="section-tag">// Request Connection</span>
+                <h3 class="section-title-neon">Initialize Connection</h3>
+                <p class="section-subtitle">Submit a contact request formatted as a configuration manifest. It's ready to apply.</p>
+            </div>
+
+            <div class="contact-container">
+                <!-- Left Info Card -->
+                <div class="contact-info-card glass-card">
+                    <h4>Direct Endpoints</h4>
+                    <p class="contact-p">Feel free to ping my direct endpoints or raise a PR to initiate communication.</p>
+                    
+                    <div class="info-items">
+                        <div class="info-item-row">
+                            <div class="item-icon"><i class="fa-solid fa-phone"></i></div>
+                            <div class="item-content">
+                                <span class="item-label">Telephone</span>
+                                <a href="tel:+918308989160" class="item-value">+91 8308989160</a>
+                            </div>
+                        </div>
+                        <div class="info-item-row">
+                            <div class="item-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="item-content">
+                                <span class="item-label">Email Gateway</span>
+                                <a href="mailto:as787145@gmail.com" class="item-value">as787145@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="info-item-row">
+                            <div class="item-icon"><i class="fa-brands fa-linkedin"></i></div>
+                            <div class="item-content">
+                                <span class="item-label">Professional Node</span>
+                                <a href="https://www.linkedin.com/in/as787145" target="_blank" rel="noopener noreferrer" class="item-value">linkedin.com/in/as787145</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="security-note">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>End-to-end SSL encryption active. Spam traffic will be null-routed.</span>
+                    </div>
+                </div>
+
+                <!-- Right Manifest Contact Form -->
+                <form class="manifest-form glass-card" id="contact-form">
+                    <div class="yaml-editor-header">
+                        <span class="dot-btn red"></span>
+                        <span class="dot-btn yellow"></span>
+                        <span class="dot-btn green"></span>
+                        <span class="file-name">contact-manifest.yaml</span>
+                    </div>
+                    
+                    <div class="yaml-lines-wrapper">
+                        <div class="yaml-line"><span class="y-key">apiVersion</span>: <span class="y-val">v1</span></div>
+                        <div class="yaml-line"><span class="y-key">kind</span>: <span class="y-val">ContactRequest</span></div>
+                        <div class="yaml-line"><span class="y-key">metadata</span>:</div>
+                        <div class="yaml-line indent-1"><span class="y-key">name</span>: <input type="text" id="contact-name" name="name" required placeholder='"your-name"' class="yaml-input"></div>
+                        <div class="yaml-line indent-1"><span class="y-key">email</span>: <input type="email" id="contact-email" name="email" required placeholder='"your-email@domain.com"' class="yaml-input"></div>
+                        <div class="yaml-line"><span class="y-key">spec</span>:</div>
+                        <div class="yaml-line indent-1"><span class="y-key">subject</span>: <input type="text" id="contact-subject" name="subject" required placeholder='"recruiting / collaboration"' class="yaml-input"></div>
+                        <div class="yaml-line indent-1"><span class="y-key">message</span>: |</div>
+                        <div class="yaml-line indent-2"><textarea id="contact-message" name="message" required placeholder="Write your message here... I will get back to you shortly." class="yaml-textarea"></textarea></div>
+                    </div>
+                    
+                    <div class="form-action-row">
+                        <button type="submit" class="submit-manifest-btn">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> kubectl apply -f contact-manifest.yaml
+                        </button>
+                    </div>
+                    <div id="form-feedback-message" class="form-feedback"></div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Abhishek Sharma. Provisioned with pure HTML, CSS and JS.</p>
+            <div class="footer-stats">
+                <span class="badge-status-cluster"><i class="fa-solid fa-circle-check"></i> cluster: active</span>
+                <span class="badge-status-cluster"><i class="fa-solid fa-code-branch"></i> v1.2.0</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Script -->
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
