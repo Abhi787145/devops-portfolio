@@ -147,9 +147,7 @@ spec:
             <span className="yaml-lbl">MANIFEST PREVIEW: deploy-connection.yaml</span>
             <span className="yaml-lang">YAML</span>
           </div>
-          <pre className="yaml-code-area">
-            <code>{yamlPreview}</code>
-          </pre>
+          <pre className="yaml-code-area"><code>{yamlPreview}</code></pre>
         </div>
       </div>
     </section>

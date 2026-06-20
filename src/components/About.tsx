@@ -28,7 +28,7 @@ const About = () => {
             </div>
             <div className="philosophy-content">
               <h5>Continuous Automation</h5>
-              <p>Eliminating operational drag by automating server creation, config audits, and dependencies builds via modular IaC blueprints.</p>
+              <p>Eliminating operational drag by automating server creation, config audits, and dependency builds via modular IaC blueprints.</p>
             </div>
           </div>
 

@@ -18,7 +18,7 @@ const Credentials = () => {
     },
     {
       title: 'AWS Certified Course',
-      issuer: 'Cloud&DevOpsHUB',
+      issuer: 'Cloud & DevOps HUB',
       date: 'March 2026',
       badge: 'DevOps'
     },

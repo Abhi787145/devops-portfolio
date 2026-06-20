@@ -17,22 +17,22 @@ const commands: Record<string, () => string> = {
   cat info.txt    - Display contact routes & endpoint details
   clear           - Wipe terminal logs`,
 
-  whoami: () => `guest@devops-node:~$ whoami
-NAME: Abhishek Sharma
-ROLE: DevOps Engineer
-PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure, application deployment, and system monitoring. Skilled in CI/CD pipelines, containerization (Docker, Kubernetes), and release management. Strong SQL Server database and production support experience.`,
+  whoami: () => `NAME:            Abhishek Sharma
+ROLE:            DevOps Engineer
+PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure,
+                 application deployment, and system monitoring. Skilled in CI/CD
+                 pipelines, containerization (Docker, Kubernetes), and release
+                 management. Strong SQL Server database and production support experience.`,
 
-  skills: () => `guest@devops-node:~$ kubectl get skills -o wide
-CATEGORY             SKILLSET
+  skills: () => `CATEGORY             SKILLSET
 AWS                  EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer
 Azure                VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts
-DevOps / CI-CD       Terraform (IaC), Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
+DevOps / CI/CD       Terraform (IaC), Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
 Databases            SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server
 Languages & Dev      Python, C/C++, .Net, Django
 AI & ITSM            Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting`,
 
-  projects: () => `guest@devops-node:~$ terraform show -module=dropshipping
-MODULE: Project - Drop Shipping (AWS infrastructure)
+  projects: () => `MODULE: Project - Drop Shipping (AWS infrastructure)
 STATUS: Deployed successfully (Active)
 DESCRIPTION: Provisioned 40+ AWS services using modular Terraform from scratch.
 ARCHITECTURAL METRICS:
@@ -42,8 +42,7 @@ ARCHITECTURAL METRICS:
   - CloudWatch metric monitoring & alarms integration.
   - Cost optimized through custom pricing configurations.`,
 
-  experience: () => `guest@devops-node:~$ cat experience.log
-[01/2023 - Present] Simplify Healthcare - Associate Application Deployment Engineer
+  experience: () => `[01/2023 - Present] Simplify Healthcare - Associate Application Deployment Engineer
 PROJECT: Multi Project Environment
 TASKS DELIVERED:
   * Managed container workloads on Docker & Kubernetes cluster nodes.
@@ -52,16 +51,14 @@ TASKS DELIVERED:
   * Configured SIEM and Azure Alerts mapping memory, CPU, and Disk metrics.
   * Handled daily production deployments; troubleshoot pipeline blockers.`,
 
-  certifications: () => `guest@devops-node:~$ get-certifications
-ACTIVE BADGES:
+  certifications: () => `ACTIVE BADGES:
   - Generative AI Foundation (June 2025) - Microsoft & upGrad
   - Microsoft Azure Fundamentals AZ-900 (October 2025)
-  - AWS Certification (March 2026) - Cloud&DevOpsHUB
+  - AWS Certification (March 2026) - Cloud & DevOps HUB
   - Cyber Security Tools & Attacks (August 2020) - Coursera
   - MNA + CloudV2 (June 2019) - Jetking`,
 
-  "cat info.txt": () => `guest@devops-node:~$ cat info.txt
-ENDPOINT CONTACT ROUTES:
+  "cat info.txt": () => `ENDPOINT CONTACT ROUTES:
   - Email:      as787145@gmail.com
   - Phone:      +91 8308989160
   - LinkedIn:   https://www.linkedin.com/in/as787145
@@ -76,8 +73,7 @@ ENDPOINT CONTACT ROUTES:
       }
       window.dispatchEvent(new Event('trigger-pipeline-sim'));
     }, 500);
-    return `guest@devops-node:~$ npm run pipeline
-[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
+    return `[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
   }
 };
 
@@ -113,15 +109,13 @@ const Skills = () => {
       const output = commands[lower]();
       setHistory(prev => [...prev, { text: output, type: 'output' }]);
     } else if (lower === 'kubectl get nodes') {
-      const output = `guest@devops-node:~$ kubectl get nodes
-NAME             STATUS   ROLES    AGE   VERSION
+      const output = `NAME             STATUS   ROLES    AGE   VERSION
 k8s-master-01    Ready    control  320d  v1.28.2
 k8s-worker-01    Ready    worker   320d  v1.28.2
 k8s-worker-02    Ready    worker   320d  v1.28.2`;
       setHistory(prev => [...prev, { text: output, type: 'output' }]);
     } else if (lower === 'terraform init') {
-      const output = `guest@devops-node:~$ terraform init
-Initializing the backend...
+      const output = `Initializing the backend...
 Initializing provider plugins...
 - Finding hashicorp/aws versions >= 4.0.0...
 - Finding hashicorp/azurerm versions >= 3.0.0...
@@ -144,9 +138,9 @@ Terraform has been successfully initialized!`;
   return (
     <section id="infrastructure" className="cluster-section container">
       <div className="section-title-wrapper">
-        <span className="sec-label">resource manager</span>
-        <h3 className="sec-title">Cloud Infrastructure & Tech Stack</h3>
-        <p className="sec-desc">Interact with the Command Console simulator to query my profile metadata, core skills database, or run deploy pipelines.</p>
+        <span className="sec-label">interactive shell</span>
+        <h3 className="sec-title">CloudOps Shell Console</h3>
+        <p className="sec-desc">Interact with the Command Console simulator to query my profile metadata, core skills database, or run deployment pipelines.</p>
       </div>
 
       {/* Terminal Command Console Simulator */}

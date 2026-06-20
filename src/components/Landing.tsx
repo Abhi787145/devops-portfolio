@@ -217,7 +217,7 @@ const Landing = () => {
         <div className="landing-right-column">
           <div className="landing-right glass-panel">
             <div className="right-card-header">
-              <span className="card-lbl">NODE REPLICAS STATUS</span>
+              <span className="card-lbl">CORE TOOLING REPLICAS (3D)</span>
               <span className="card-ping">Status: Active</span>
             </div>
             <div className="canvas-wrapper">
