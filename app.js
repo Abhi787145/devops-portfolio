@@ -1,597 +1,626 @@
 /**
- * Abhishek Sharma - DevOps Portfolio Application JS
- * Highly interactive components: Canvas Particles, Terminal Console, Pipeline Simulator, AWS diagram
+ * Abhishek Sharma - CloudOps Dashboard console JS
+ * Logic: Live updating telemetry chart, Kubernetes Pod tabs, Sandbox runner, and blueprint configs
  */
 
 /* ==========================================================================
-   1. Canvas Particle System (Network Node Simulation)
+   1. Live Telemetry Canvas (Fluctuating Telemetry Chart)
    ========================================================================== */
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-
-let particlesArray = [];
-let animationFrameId = null;
-
-// Mouse coordinates
-const mouse = {
-    x: null,
-    y: null,
-    radius: 120 // Interaction radius
-};
-
-window.addEventListener('mousemove', (event) => {
-    mouse.x = event.x;
-    mouse.y = event.y;
-});
-
-window.addEventListener('mouseout', () => {
-    mouse.x = null;
-    mouse.y = null;
-});
-
-// Particle Class
-class Particle {
-    constructor(x, y, directionX, directionY, size, color) {
-        this.x = x;
-        this.y = y;
-        this.directionX = directionX;
-        this.directionY = directionY;
-        this.size = size;
-        this.color = color;
-    }
-
-    // Draw single particle
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-
-    // Update particle position & handle screen bounces and mouse interaction
-    update() {
-        // Boundary check
-        if (this.x > canvas.width || this.x < 0) {
-            this.directionX = -this.directionX;
-        }
-        if (this.y > canvas.height || this.y < 0) {
-            this.directionY = -this.directionY;
-        }
-
-        // Mouse collision / avoidance physics
-        if (mouse.x !== null && mouse.y !== null) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < mouse.radius + this.size) {
-                // Calculate push force
-                const forceDirectionX = dx / distance;
-                const forceDirectionY = dy / distance;
-                const maxForce = 3;
-                const force = (mouse.radius - distance) / mouse.radius;
-                
-                this.x -= forceDirectionX * force * maxForce;
-                this.y -= forceDirectionY * force * maxForce;
-            }
-        }
-
-        // Float particles
-        this.x += this.directionX;
-        this.y += this.directionY;
-        
-        this.draw();
-    }
-}
-
-// Populate particle array based on viewport area
-function initParticles() {
-    particlesArray = [];
-    let numberOfParticles = (canvas.width * canvas.height) / 9000;
-    numberOfParticles = Math.min(numberOfParticles, 120); // Cap particles
-
-    for (let i = 0; i < numberOfParticles; i++) {
-        let size = Math.random() * 2 + 1; // 1 to 3 pixels
-        let x = Math.random() * (window.innerWidth - size * 2) + size;
-        let y = Math.random() * (window.innerHeight - size * 2) + size;
-        
-        // Speed
-        let directionX = (Math.random() * 0.4) - 0.2;
-        let directionY = (Math.random() * 0.4) - 0.2;
-        
-        // Color mapping - subtle cyan, purple and dark shades
-        let colors = [
-            'rgba(0, 242, 254, 0.45)', // Cyan
-            'rgba(189, 0, 255, 0.35)', // Purple
-            'rgba(143, 156, 174, 0.2)'  // Grey
-        ];
-        let color = colors[Math.floor(Math.random() * colors.length)];
-
-        particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
-    }
-}
-
-// Draw connections between close particles
-function connectParticles() {
-    let maxDistance = 115;
-    for (let a = 0; a < particlesArray.length; a++) {
-        for (let b = a; b < particlesArray.length; b++) {
-            let dx = particlesArray[a].x - particlesArray[b].x;
-            let dy = particlesArray[a].y - particlesArray[b].y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < maxDistance) {
-                // Fade line opacity based on distance
-                let alpha = (1 - (distance / maxDistance)) * 0.12;
-                ctx.strokeStyle = `rgba(0, 242, 254, ${alpha})`;
-                ctx.lineWidth = 0.8;
-                ctx.beginPath();
-                ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-// Animation loop
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-    }
-    connectParticles();
-    animationFrameId = requestAnimationFrame(animateParticles);
-}
-
-// Handle resize event
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    initParticles();
-});
-
-// Start canvas system
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-initParticles();
-animateParticles();
-
-
-/* ==========================================================================
-   2. Scroll & UI Element Handlers (Nav bar shrink, mobile menu)
-   ========================================================================== */
-const navbar = document.querySelector('.navbar');
-const navLinks = document.querySelectorAll('.nav-link');
-const sections = document.querySelectorAll('section');
-const mobileToggle = document.querySelector('.mobile-toggle');
-const navMenu = document.querySelector('.nav-menu');
-
-// Shrink header on scroll
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-
-    // Scroll Spy: Highlight active nav link
-    let current = '';
-    sections.forEach((section) => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (window.scrollY >= sectionTop - 120) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach((link) => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
-        }
-    });
-});
-
-// Mobile menu toggle
-mobileToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('open');
-    const icon = mobileToggle.querySelector('i');
-    if (navMenu.classList.contains('open')) {
-        icon.className = 'fa-solid fa-xmark';
-    } else {
-        icon.className = 'fa-solid fa-bars';
-    }
-});
-
-// Close mobile menu when clicking nav items
-navLinks.forEach((link) => {
-    link.addEventListener('click', () => {
-        navMenu.classList.remove('open');
-        mobileToggle.querySelector('i').className = 'fa-solid fa-bars';
-    });
-});
-
-
-/* ==========================================================================
-   3. Interactive Terminal Command Console
-   ========================================================================== */
-const terminalInput = document.getElementById('terminal-input');
-const terminalBody = document.getElementById('terminal-body');
-const presetBtns = document.querySelectorAll('.preset-btn');
-
-// Command database
-const commands = {
-    help: () => `Available commands:
-  whoami          - Brief overview profile of Abhishek Sharma
-  skills          - Detail of DevOps, Cloud & Development skills
-  projects        - Overview of provisioned AWS Drop Shipping project
-  experience      - Review work history at Simplify Healthcare
-  certifications  - List active course certifications (AZ-900, AWS, etc.)
-  pipeline        - Run the simulated CI/CD build & deploy pipeline
-  cat info.txt    - Display contact routes & endpoint details
-  clear           - Wipe terminal logs`,
-
-    whoami: () => `guest@devops-node:~$ whoami
-NAME: Abhishek Sharma
-ROLE: DevOps Engineer
-PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure, application deployment, and system monitoring. Skilled in CI/CD pipelines, containerization (Docker, Kubernetes), and release management. Strong SQL Server database and production support experience.`,
-
-    skills: () => `guest@devops-node:~$ kubectl get skills -o wide
-CATEGORY             SKILLSET
-AWS                  EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer
-Azure                VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts
-DevOps / CI-CD       Terraform (IaC), Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
-Databases            SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server
-Languages & Dev      Python, C/C++, .Net, Django
-AI & ITSM            Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting`,
-
-    projects: () => `guest@devops-node:~$ terraform show -module=dropshipping
-MODULE: Project - Drop Shipping (AWS infrastructure)
-STATUS: Deployed successfully (Active)
-DESCRIPTION: Provisioned 40+ AWS services using modular Terraform from scratch.
-ARCHITECTURAL METRICS:
-  - 1 Virtual Private Cloud (VPC) with public/private subnetting.
-  - Multi-AZ Web Application Load Balancer (ALB) + EC2 Auto Scaling Groups.
-  - Secure SQL Relational Database (RDS Multi-AZ).
-  - CloudWatch metric monitoring & alarms integration.
-  - Cost optimized through custom pricing configurations.`,
-
-    experience: () => `guest@devops-node:~$ cat experience.log
-[01/2023 - Present] Simplify Healthcare - Associate Application Deployment Engineer
-PROJECT: Multi Project Environment
-TASKS DELIVERED:
-  * Managed container workloads on Docker & Kubernetes cluster nodes.
-  * Deployed apps onto Azure App Services; administered storage configurations.
-  * Administered SQL database jobs, Bacpac migrations, and backups.
-  * Configured SIEM and Azure Alerts mapping memory, CPU, and Disk metrics.
-  * Handled daily production deployments; troubleshoot pipeline blockers.`,
-
-    certifications: () => `guest@devops-node:~$ get-certifications
-ACTIVE BADGES:
-  - Generative AI Foundation (June 2025) - Microsoft & upGrad
-  - Microsoft Azure Fundamentals AZ-900 (October 2025)
-  - AWS Certification (March 2026) - Cloud&DevOpsHUB
-  - Cyber Security Tools & Attacks (August 2020) - Coursera
-  - MNA + CloudV2 (June 2019) - Jetking`,
-
-    "cat info.txt": () => `guest@devops-node:~$ cat info.txt
-ENDPOINT CONTACT ROUTES:
-  - Email:      as787145@gmail.com
-  - Phone:      +91 8308989160
-  - LinkedIn:   https://www.linkedin.com/in/as787145
-  - Github:     https://github.com/abhisheksharma (simulated)
-  - Cluster:    visitor-prod-1`,
-
-    pipeline: () => {
-        // Trigger the pipeline visualizer component
-        setTimeout(() => {
-            const pipelineSection = document.getElementById('pipeline-section');
-            if (pipelineSection) {
-                pipelineSection.scrollIntoView({ behavior: 'smooth' });
-                runPipelineSimulation();
-            }
-        }, 300);
-        return `guest@devops-node:~$ npm run pipeline
-[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
-    }
-};
-
-// Handle CLI submission
-function handleCommand(cmdText) {
-    const trimmed = cmdText.trim();
-    if (!trimmed) return;
-
-    // Create line showing command typed
-    appendTerminalLine(`<span class="prompt">guest@devops-node:~$</span> ${escapeHTML(trimmed)}`);
-
-    const lower = trimmed.toLowerCase();
+const metricsCanvas = document.getElementById('live-telemetry-canvas');
+if (metricsCanvas) {
+    const mCtx = metricsCanvas.getContext('2d');
     
-    if (lower === 'clear') {
-        terminalBody.innerHTML = `
-            <div class="terminal-line text-system">System logs cleared. Session active.</div>
+    // Set display buffer sizes
+    function resizeCanvas() {
+        const rect = metricsCanvas.getBoundingClientRect();
+        metricsCanvas.width = rect.width;
+        metricsCanvas.height = rect.height;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial telemetry data queue (20 points)
+    let telemetryPoints = Array.from({ length: 22 }, () => Math.floor(Math.random() * 15) + 10);
+    const cpuLoadVal = document.getElementById('cpu-load-val');
+    const cpuLoadBar = document.getElementById('cpu-load-bar');
+
+    function drawChart() {
+        if (!metricsCanvas.width) return;
+        mCtx.clearRect(0, 0, metricsCanvas.width, metricsCanvas.height);
+
+        // Draw background grid lines inside canvas
+        mCtx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+        mCtx.lineWidth = 1;
+        const gridLines = 4;
+        for (let i = 1; i <= gridLines; i++) {
+            const y = (metricsCanvas.height / (gridLines + 1)) * i;
+            mCtx.beginPath();
+            mCtx.moveTo(0, y);
+            mCtx.lineTo(metricsCanvas.width, y);
+            mCtx.stroke();
+        }
+
+        const pointCount = telemetryPoints.length;
+        const stepX = metricsCanvas.width / (pointCount - 1);
+        
+        // Map points to canvas height (0 - 100 max CPU load)
+        const points = telemetryPoints.map((val, idx) => {
+            const x = idx * stepX;
+            // Scale so 100% CPU is near top, 0% is near bottom
+            const y = metricsCanvas.height - (val / 100) * (metricsCanvas.height * 0.85) - 10;
+            return { x, y };
+        });
+
+        // Draw fill area first
+        const gradient = mCtx.createLinearGradient(0, 0, 0, metricsCanvas.height);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.15)'); // Emerald transparent
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        
+        mCtx.beginPath();
+        mCtx.moveTo(0, metricsCanvas.height);
+        points.forEach(pt => mCtx.lineTo(pt.x, pt.y));
+        mCtx.lineTo(metricsCanvas.width, metricsCanvas.height);
+        mCtx.closePath();
+        mCtx.fillStyle = gradient;
+        mCtx.fill();
+
+        // Draw line path
+        mCtx.beginPath();
+        mCtx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            // Smooth curve mapping (bezier control points)
+            const xc = (points[i - 1].x + points[i].x) / 2;
+            const yc = (points[i - 1].y + points[i].y) / 2;
+            mCtx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, xc, yc);
+        }
+        mCtx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+        mCtx.strokeStyle = '#10b981'; // Emerald solid line
+        mCtx.lineWidth = 2;
+        mCtx.stroke();
+
+        // Draw neon glow dot on the last point
+        const lastPt = points[points.length - 1];
+        mCtx.beginPath();
+        mCtx.arc(lastPt.x - 2, lastPt.y, 4, 0, Math.PI * 2);
+        mCtx.fillStyle = '#10b981';
+        mCtx.shadowColor = '#10b981';
+        mCtx.shadowBlur = 8;
+        mCtx.fill();
+        // Reset shadow
+        mCtx.shadowBlur = 0;
+    }
+
+    // Telemetry tick updater
+    setInterval(() => {
+        // Fluctuating value around previous point to avoid sudden jumps
+        const lastVal = telemetryPoints[telemetryPoints.length - 1];
+        let diff = (Math.random() * 10) - 5; // -5 to +5
+        let newVal = Math.round(lastVal + diff);
+        
+        // Clamp boundaries between 8% and 40% CPU loads
+        newVal = Math.max(8, Math.min(newVal, 40));
+        
+        telemetryPoints.shift();
+        telemetryPoints.push(newVal);
+
+        // Update labels
+        if (cpuLoadVal) cpuLoadVal.textContent = `${newVal}%`;
+        if (cpuLoadBar) {
+            cpuLoadBar.style.width = `${newVal}%`;
+            // Color shifts based on high load spikes (just a nice details)
+            if (newVal > 30) {
+                cpuLoadBar.style.background = 'var(--accent-amber)';
+            } else {
+                cpuLoadBar.style.background = 'var(--accent-indigo)';
+            }
+        }
+
+        drawChart();
+    }, 1500);
+
+    drawChart();
+}
+
+
+/* ==========================================================================
+   2. Kubernetes Pods Namespace Skills Selector
+   ========================================================================== */
+// Pods dataset representing Abhishek's skillset
+const namespacePods = {
+    infra: [
+        {
+            id: "terraform",
+            name: "pod/terraform-operator",
+            version: "v1.6.2",
+            desc: "Declarative Infrastructure as Code (IaC) to construct repeatable resources. Built VPCs, EC2 instances, security rules, and databases cleanly without manual drift.",
+            logs: `[INFO] Initializing terraform provider plugins...
+[INFO] Terraform AWS provider: version v5.12.0 loaded.
+[INFO] State Backend: remote s3 storage (dropshipping-state-bucket) verified.
+[INFO] Refreshing terraform state mapping...
+[INFO] 40+ resources discovered in state file.
+[SUCCESS] State matches cloud records. 0 changes required.`
+        },
+        {
+            id: "aws",
+            name: "pod/aws-cloud-controller",
+            version: "v2026.1",
+            desc: "Expertise in core AWS service architectures: VPC subnets configuration, Route53 DNS management, Application Load Balancers (ALBs), and EC2 computing profiles.",
+            logs: `[INFO] Requesting IAM session credentials...
+[INFO] Identity authenticated: arn:aws:iam::88914022:user/abhishek
+[INFO] Querying subnet layouts inside ap-south-1...
+[INFO] Subnet ap-south-1a (Public): Active / CIDR 10.0.1.0/24
+[INFO] Subnet ap-south-1b (Private): Active / CIDR 10.0.10.0/24
+[INFO] Status: VPC network path routing validated.`
+        },
+        {
+            id: "azure",
+            name: "pod/azure-resource-manager",
+            version: "v3.85.0",
+            desc: "Deploying resources inside Azure App Services, configuring Storage Accounts, Blob containers, and SQL Server instances connected via Elastic Pools.",
+            logs: `[INFO] Authenticated with Azure Active Directory.
+[INFO] Active subscription: Prod-DevOps-Subscription (Active)
+[INFO] Checking app service hosts: 3 running workloads.
+[INFO] Azure App Service "production-web-host" reports 100% health check passes.
+[INFO] Storage accounts synced. 0 latency flags.`
+        }
+    ],
+    containers: [
+        {
+            id: "k8s",
+            name: "pod/kubernetes-service-controller",
+            version: "v1.28.4",
+            desc: "Managing container nodes clusters. Deploying Pod configs, setting Service interfaces, scaling deployment replicas, and monitoring operational pods status.",
+            logs: `[INFO] kubectl describe deployment web-app-deployment
+Name:                   web-app-deployment
+Namespace:              production-apps
+Replicas:               3 desired | 3 updated | 3 total | 3 available
+Conditions:             Available: True (MinimumReplicasAvailable)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ---   ----                   -------
+  Normal  ScalingReplicaSet  12m   deployment-controller  Scaled replica set to 3`
+        },
+        {
+            id: "docker",
+            name: "pod/docker-runtime-engine",
+            version: "v24.0.9",
+            desc: "Constructing multi-stage optimized Dockerfiles to compress deployment base layers. Executing local testing containers and managing image releases registries.",
+            logs: `[INFO] docker build -t abhishek-portfolio:latest .
+Sending build context to Docker daemon  32.4MB
+Step 1/3 : FROM node:20-alpine AS builder -> Using cache
+Step 2/3 : COPY . . -> Done (0.8s)
+Step 3/3 : RUN npm run build -> Success (2.4s)
+Successfully built image: sha256:d892a01d44bc (124MB)`
+        },
+        {
+            id: "ghactions",
+            name: "pod/github-actions-runner",
+            version: "v2.312.0",
+            desc: "Designing secure GitHub actions YAML files. Setting permissions scopes, caches parameters, and deploying build artifacts onto target server endpoints.",
+            logs: `[INFO] Run actions/checkout@v4
+[INFO] Syncing git commit history to runner...
+[INFO] Run actions/setup-node@v4
+[INFO] Node environment setup completed: node v22.2.0
+[INFO] Run npm run build -> Build folder generated
+[SUCCESS] Uploading artifact dist/ ... Ready. Run completed.`
+        },
+        {
+            id: "jenkins",
+            name: "pod/jenkins-automation-server",
+            version: "v2.426.3",
+            desc: "Writing Jenkinsfile pipeline pipelines for automation build releases. Coordinating pipeline steps and executing shell commands on remote slaves.",
+            logs: `[INFO] Starting build task #142...
+[INFO] Checking out code from repository...
+[INFO] Stage: [Compile Dependencies] -> Executed successfully (12s)
+[INFO] Stage: [Unit Tests] -> All tests passing (18s)
+[SUCCESS] Pipeline finished status: SUCCESSful.`
+        }
+    ],
+    db: [
+        {
+            id: "sqlserver",
+            name: "pod/mssql-db-administrator",
+            version: "v15.0.2",
+            desc: "Production SQL Server administration. Automating backups, script queries executions, schema comparisons using Redgate, and migrating DB instances (bacpac).",
+            logs: `[INFO] DB admin instance connection active.
+[INFO] Executing scheduled database transaction log backup...
+[INFO] Backup operation: [SUCCESS] Saved to local storage blob.
+[INFO] Running database integrity checks (DBCC CHECKDB)...
+[SUCCESS] 0 allocation errors, 0 consistency errors found.`
+        },
+        {
+            id: "dbtools",
+            name: "pod/ssms-redgate-operator",
+            version: "v19.1.0",
+            desc: "Utilizing database administration utilities including SQL Server Management Studio (SSMS), Redgate SQL Compare, PGAdmin, and MongoDB Compass.",
+            logs: `[INFO] Running schema diff comparison with Redgate comparison tool...
+[INFO] Source Database: Development-Replica
+[INFO] Target Database: Production-Instance
+[INFO] Results: 2 stored procedures out of sync.
+[INFO] Generating deployment synchronisation script...
+[SUCCESS] Sync script generated. Ready for code promotion.`
+        },
+        {
+            id: "iis",
+            name: "pod/iis-web-host",
+            version: "v10.0",
+            desc: "Configuring IIS Web Server hosts, managing application pools, binding secure SSL certificates, and troubleshooting HTTP request issues.",
+            logs: `[INFO] Querying IIS application pool state...
+[INFO] AppPool "SimplifyAppPool": Status: RUNNING (PID: 20994)
+[INFO] Active SSL bindings: https://app.simplifyhealthcare.com (443)
+[INFO] CPU usage pool: 2.4% / Memory allocation: 512MB
+[INFO] Status check: OK`
+        }
+    ],
+    dev: [
+        {
+            id: "python",
+            name: "pod/python-runtime-3-11",
+            version: "v3.11.8",
+            desc: "Writing scripting tools in Python to automate log monitoring, audit server configurations, and develop Django API backend modules.",
+            logs: `[INFO] python --version -> Python 3.11.8
+[INFO] Running file script: audit_ports.py
+[INFO] Scanning system listening network ports...
+[WARNING] Port 8080 listening without firewall block.
+[INFO] Script generated firewall recommendation rule. Task complete.`
+        },
+        {
+            id: "dotnet",
+            name: "pod/dotnet-runtime",
+            version: "v8.0.0",
+            desc: "Understanding backend structures, deploying .NET API application pools, and troubleshooting IIS runtime issues.",
+            logs: `[INFO] dotnet --info
+.NET SDK version: 8.0.100
+[INFO] Restoring project dependencies...
+[INFO] Restored successfully. (1.2s)
+[INFO] Running code compilation: dotnet build -c Release
+[SUCCESS] 0 Errors, 0 Warnings.`
+        }
+    ],
+    monitoring: [
+        {
+            id: "siem",
+            name: "pod/siem-security-analyzer",
+            version: "v8.11.0",
+            desc: "Monitoring system security alerts, parsing system event logs, and identifying threat indicators to resolve production incidents proactively.",
+            logs: `[INFO] Connecting to SIEM event indexer gateway...
+[INFO] Active streams checked: 4 logs channels active.
+[INFO] Parsing event logs for patterns of security vulnerabilities...
+[INFO] Alert check: No brute force signatures detected.
+[SUCCESS] Cluster security assessment status: SAFE.`
+        },
+        {
+            id: "alerts",
+            name: "pod/azure-monitor-alerts",
+            version: "v1.12.0",
+            desc: "Configuring metrics alerting criteria for disk space thresholds, CPU exhaustion, and memory leaks. Directing alerts to support teams via GLPI/ITSM.",
+            logs: `[INFO] Querying monitor rules database...
+[INFO] Alert rule [DiskSpaceCritical]: Enabled (Threshold: 85% full)
+[INFO] Alert rule [CPUUtilizationHigh]: Enabled (Threshold: 80% for 5 mins)
+[INFO] Diagnostic probe active. Host disks capacity checked: 52% free.`
+        },
+        {
+            id: "prompting",
+            name: "pod/gpt-ai-assistant",
+            version: "v4.0.0",
+            desc: "Utilizing AI prompting techniques to brainstorm system designs, write script structures, and automate operational documentation.",
+            logs: `[INFO] AI prompt request received: "Generate modular terraform VPC template"
+[INFO] LLM completion response constructed (2.4s)
+[INFO] Generating terraform files structure...
+[INFO] Completed: main.tf, variables.tf, outputs.tf outputted.
+[SUCCESS] Template generated.`
+        }
+    ]
+};
+
+// Bind elements
+const nsTabs = document.querySelectorAll('.ns-tab');
+const podsGrid = document.getElementById('pods-grid');
+const podConsoleLogs = document.getElementById('pod-console-logs');
+const currentNamespaceTitle = document.querySelector('.current-namespace-title');
+const podCountBadge = document.getElementById('pod-count');
+
+function loadNamespacePods(nsKey) {
+    const pods = namespacePods[nsKey];
+    if (!pods) return;
+
+    // Update namespace title & badge
+    const friendlyNames = {
+        infra: "ns/cloud-infra",
+        containers: "ns/containers-ci-cd",
+        db: "ns/databases-admin",
+        dev: "ns/languages-it",
+        monitoring: "ns/monitoring-ai"
+    };
+    currentNamespaceTitle.innerHTML = `<i class="fa-solid fa-cube"></i> Namespace: ${friendlyNames[nsKey]}`;
+    podCountBadge.textContent = `${pods.length} Pods Running`;
+
+    // Clear grid
+    podsGrid.innerHTML = '';
+
+    // Render pods
+    pods.forEach((pod, index) => {
+        const card = document.createElement('div');
+        card.className = `pod-card ${index === 0 ? 'active-pod' : ''}`;
+        card.setAttribute('data-pod-id', pod.id);
+        card.innerHTML = `
+            <div class="pod-status">
+                <span class="pod-dot"></span>
+                <span class="pod-status-text">Running</span>
+            </div>
+            <h4 class="pod-name">${pod.name}</h4>
+            <span class="pod-version">${pod.version}</span>
         `;
-    } else if (commands[lower]) {
-        const output = commands[lower]();
-        appendTerminalLine(output, 'terminal-output');
-    } else if (lower === 'kubectl get nodes') {
-        appendTerminalLine(`guest@devops-node:~$ kubectl get nodes
-NAME             STATUS   ROLES    AGE   VERSION
-k8s-master-01    Ready    control  320d  v1.28.2
-k8s-worker-01    Ready    worker   320d  v1.28.2
-k8s-worker-02    Ready    worker   320d  v1.28.2`, 'terminal-output');
-    } else if (lower === 'terraform init') {
-        appendTerminalLine(`guest@devops-node:~$ terraform init
-Initializing the backend...
-Initializing provider plugins...
-- Finding hashicorp/aws versions >= 4.0.0...
-- Finding hashicorp/azurerm versions >= 3.0.0...
-Terraform has been successfully initialized!`, 'terminal-output');
-    } else {
-        appendTerminalLine(`bash: command not found: ${escapeHTML(trimmed)}. Type 'help' for options.`, 'text-error');
+
+        // Click event listener inside node creation
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.pod-card').forEach(c => c.classList.remove('active-pod'));
+            card.classList.add('active-pod');
+            
+            // Show logs in console
+            const consoleTabName = document.querySelector('.console-tab-name');
+            consoleTabName.innerHTML = `<i class="fa-solid fa-code"></i> kubectl logs ${pod.name}`;
+            podConsoleLogs.textContent = pod.logs;
+        });
+
+        podsGrid.appendChild(card);
+    });
+
+    // Default trigger first pod logs printout
+    if (pods.length > 0) {
+        const consoleTabName = document.querySelector('.console-tab-name');
+        consoleTabName.innerHTML = `<i class="fa-solid fa-code"></i> kubectl logs ${pods[0].name}`;
+        podConsoleLogs.textContent = pods[0].logs;
     }
-
-    terminalInput.value = '';
-    terminalBody.scrollTop = terminalBody.scrollHeight; // Scroll to bottom
 }
 
-function appendTerminalLine(text, className = '') {
-    const div = document.createElement('div');
-    div.className = `terminal-line ${className}`;
-    div.innerHTML = text.replace(/\n/g, '<br>');
-    terminalBody.appendChild(div);
-}
+// Bind tabs click event
+nsTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        nsTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
 
-function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-// Input listeners
-terminalInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        handleCommand(terminalInput.value);
-    }
-});
-
-// Preset buttons trigger
-presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const cmd = btn.getAttribute('data-cmd');
-        if (cmd === 'clear') {
-            handleCommand('clear');
-        } else {
-            handleCommand(cmd);
-        }
+        const nsKey = tab.getAttribute('data-ns');
+        loadNamespacePods(nsKey);
     });
 });
+
+// Initial load default namespace
+loadNamespacePods('infra');
 
 
 /* ==========================================================================
-   4. DevOps CI/CD Pipeline Simulator
+   3. Interactive Deployment Sandbox Orchestrator
    ========================================================================== */
-const runPipelineBtn = document.getElementById('run-pipeline-btn');
-const clearLogsBtn = document.getElementById('clear-logs-btn');
-const pipelineLogs = document.getElementById('pipeline-logs');
-const pipelineStatusText = document.getElementById('pipeline-status-text');
+const sandboxForm = document.getElementById('sandbox-form');
+const sandboxDeployBtn = document.getElementById('sandbox-deploy-btn');
+const sandboxStdoutLogs = document.getElementById('sandbox-stdout-logs');
+const sandboxPipelineStatus = document.getElementById('sandbox-pipeline-status');
 
-const stages = {
-    source: document.getElementById('stage-source'),
-    build: document.getElementById('stage-build'),
-    test: document.getElementById('stage-test'),
-    deploy: document.getElementById('stage-deploy')
+const flowSteps = {
+    init: document.getElementById('step-init'),
+    build: document.getElementById('step-build'),
+    verify: document.getElementById('step-verify'),
+    deploy: document.getElementById('step-deploy')
 };
 
-let pipelineRunning = false;
+let sandboxRunning = false;
 
-function addLogLine(text, type = '') {
+function appendStdoutLine(text, type = '') {
     const div = document.createElement('div');
-    div.className = `log-line ${type}`;
-    // Timestamp
-    const now = new Date().toISOString().slice(11, 19);
-    div.innerHTML = `<span class="text-muted">[${now}]</span> ${text}`;
-    pipelineLogs.appendChild(div);
-    pipelineLogs.scrollTop = pipelineLogs.scrollHeight;
+    div.style.marginBottom = '6px';
+    if (type === 'success') div.style.color = 'var(--accent-emerald)';
+    if (type === 'error') div.style.color = 'var(--accent-rose)';
+    if (type === 'info') div.style.color = 'var(--accent-indigo)';
+    
+    const time = new Date().toISOString().slice(11, 19);
+    div.innerHTML = `<span style="color: var(--text-muted)">[${time}]</span> ${text}`;
+    sandboxStdoutLogs.appendChild(div);
+    sandboxStdoutLogs.scrollTop = sandboxStdoutLogs.scrollHeight;
 }
 
-function resetPipelineStages() {
-    Object.values(stages).forEach(stage => {
-        stage.className = 'pipeline-stage';
-        stage.querySelector('.stage-status').textContent = 'Pending';
-        stage.querySelector('.progress-fill').style.width = '0%';
+function resetFlowSteps() {
+    Object.values(flowSteps).forEach(step => {
+        step.className = 'flow-step';
+    });
+    // Reset connectors width via CSS manipulation
+    document.querySelectorAll('.flow-step-connector').forEach(c => {
+        c.style.setProperty('--after-width', '0%');
+        c.classList.remove('active-conn');
     });
 }
 
-function runPipelineSimulation() {
-    if (pipelineRunning) return;
+function runSandboxDeployment(event) {
+    event.preventDefault();
+    if (sandboxRunning) return;
+
+    sandboxRunning = true;
+    sandboxDeployBtn.disabled = true;
+    sandboxPipelineStatus.className = 'stdout-status running';
+    sandboxPipelineStatus.textContent = 'RUNNING';
+
+    // Clear console output
+    sandboxStdoutLogs.innerHTML = '';
+    resetFlowSteps();
+
+    // Read form values
+    const cloudDest = document.querySelector('input[name="cloud"]:checked').value;
+    const appStack = document.getElementById('sandbox-stack').value;
     
-    pipelineRunning = true;
-    runPipelineBtn.disabled = true;
-    pipelineStatusText.className = 'status-running';
-    pipelineStatusText.textContent = 'RUNNING';
-    
-    // Reset stages first
-    resetPipelineStages();
-    pipelineLogs.innerHTML = '';
-    
-    addLogLine('Initializing deployment job ID: job-hash-88916...', 'text-cyan');
-    
-    // Timeline of pipeline execution steps
-    const timeline = [
-        // --- 1. SOURCE STAGE ---
+    // Checked steps
+    const selectedSteps = Array.from(document.querySelectorAll('input[name="steps"]:checked')).map(el => el.value);
+
+    // Logs compilation database based on configs chosen
+    const cloudName = cloudDest === 'aws' ? 'AWS (ap-south-1)' : 'Azure (ResourceGroup-Prod)';
+    const cloudAuthLog = cloudDest === 'aws' 
+        ? 'Reading ~/.aws/credentials profile config...' 
+        : 'Accessing Azure CLI Service Principal token credentials...';
+
+    let buildLog = '';
+    let buildTargetSize = '124MB';
+    if (appStack === 'vite') {
+        buildLog = 'npm run build ➜ vite build --outDir dist/';
+        buildTargetSize = '4.2MB (Static Bundle Assets)';
+    } else if (appStack === 'dotnet') {
+        buildLog = 'dotnet publish -c Release -o ./publish';
+        buildTargetSize = '42.8MB (Binary Executable)';
+    } else {
+        buildLog = 'pip install -r requirements.txt && python manage.py collectstatic --noinput';
+        buildTargetSize = '88.1MB (Django Python Runtime)';
+    }
+
+    appendStdoutLine(`Initializing Sandbox Deployment Job (ID: env-deploy-run-${Math.floor(Math.random() * 90000) + 10000})`, 'info');
+
+    // Timeout scheduler sequence
+    const pipelineSequence = [
+        // --- STEP 1: INIT ---
         {
-            delay: 1000,
+            delay: 800,
             action: () => {
-                stages.source.classList.add('active');
-                stages.source.querySelector('.stage-status').textContent = 'Fetching...';
-                addLogLine('Fetching source repository from origin/main...');
+                flowSteps.init.classList.add('active');
+                appendStdoutLine(`[INIT] Connecting to destination cloud host: ${cloudName}...`);
+                appendStdoutLine(`[INIT] ${cloudAuthLog}`);
             }
         },
         {
-            delay: 2200,
+            delay: 1800,
             action: () => {
-                stages.source.querySelector('.progress-fill').style.width = '100%';
-                addLogLine('Git webhook signature verified.');
-                addLogLine('Commit ref: <span class="text-cyan">f34d19b</span> (Author: Abhishek Sharma)');
+                flowSteps.init.classList.remove('active');
+                flowSteps.init.classList.add('success');
+                appendStdoutLine(`[INIT] Connection established. Configured secure gateway.`, 'success');
+                // Animate connector 1
+                document.querySelectorAll('.flow-step-connector')[0].classList.add('active-conn');
+            }
+        },
+        // --- STEP 2: COMPILE ---
+        {
+            delay: 2600,
+            action: () => {
+                flowSteps.build.classList.add('active');
+                appendStdoutLine(`[COMPILE] Compiling dependency assets tags...`);
+                appendStdoutLine(`[COMPILE] Running target build script: <code>${buildLog}</code>`);
             }
         },
         {
-            delay: 3000,
+            delay: 3800,
             action: () => {
-                stages.source.classList.remove('active');
-                stages.source.classList.add('success');
-                stages.source.querySelector('.stage-status').textContent = 'Completed';
-                addLogLine('Source code pulled successfully.', 'text-success');
-            }
-        },
-        // --- 2. BUILD STAGE ---
-        {
-            delay: 4000,
-            action: () => {
-                stages.build.classList.add('active');
-                stages.build.querySelector('.stage-status').textContent = 'Building...';
-                addLogLine('Loading Docker Daemon... Host OS is ready.');
-                addLogLine('Running command: <code>docker build -t abhishek-portfolio:latest .</code>');
+                appendStdoutLine(`[COMPILE] Packaging files inside docker builder instance...`);
+                appendStdoutLine(`[COMPILE] Image output built successfully. Size: ${buildTargetSize}.`);
             }
         },
         {
-            delay: 5000,
+            delay: 4600,
             action: () => {
-                stages.build.querySelector('.progress-fill').style.width = '35%';
-                addLogLine('Step 1/4: Pulling alpine base node image...');
+                flowSteps.build.classList.remove('active');
+                flowSteps.build.classList.add('success');
+                appendStdoutLine(`[COMPILE] Artifact created. Docker image tagged: sandbox-deploy:latest`, 'success');
+                // Animate connector 2
+                document.querySelectorAll('.flow-step-connector')[1].classList.add('active-conn');
             }
         },
+        // --- STEP 3: VERIFY ---
         {
-            delay: 6000,
+            delay: 5400,
             action: () => {
-                stages.build.querySelector('.progress-fill').style.width = '70%';
-                addLogLine('Step 2/4: Copying files & Installing static dependencies...');
-            }
-        },
-        {
-            delay: 7200,
-            action: () => {
-                stages.build.querySelector('.progress-fill').style.width = '100%';
-                addLogLine('Step 3/4: Compiling static production bundle...');
-                addLogLine('Step 4/4: Exposing ports config and compressing image...');
-            }
-        },
-        {
-            delay: 8000,
-            action: () => {
-                stages.build.classList.remove('active');
-                stages.build.classList.add('success');
-                stages.build.querySelector('.stage-status').textContent = 'Built';
-                addLogLine('Container image built successfully: abhishek-portfolio:latest (124MB)', 'text-success');
-            }
-        },
-        // --- 3. TEST STAGE ---
-        {
-            delay: 9000,
-            action: () => {
-                stages.test.classList.add('active');
-                stages.test.querySelector('.stage-status').textContent = 'Testing...';
-                addLogLine('Launching Jest automated testing workspace...');
-            }
-        },
-        {
-            delay: 10000,
-            action: () => {
-                stages.test.querySelector('.progress-fill').style.width = '50%';
-                addLogLine('PASS: tests/performance.test.js (1.1s)');
-                addLogLine('PASS: tests/routes.test.js (0.4s)');
-            }
-        },
-        {
-            delay: 11000,
-            action: () => {
-                stages.test.querySelector('.progress-fill').style.width = '100%';
-                addLogLine('Running security container vulnerability scan...');
-                addLogLine('<span class="text-success">[VULNERABILITIES]</span> 0 discovered (Critical: 0, High: 0)');
-            }
-        },
-        {
-            delay: 11800,
-            action: () => {
-                stages.test.classList.remove('active');
-                stages.test.classList.add('success');
-                stages.test.querySelector('.stage-status').textContent = 'Passed';
-                addLogLine('All test suits succeeded. Container scan clean.', 'text-success');
-            }
-        },
-        // --- 4. DEPLOY STAGE ---
-        {
-            delay: 12800,
-            action: () => {
-                stages.deploy.classList.add('active');
-                stages.deploy.querySelector('.stage-status').textContent = 'Deploying...';
-                addLogLine('Establishing connection context to Kubernetes cluster...');
-                addLogLine('Applying K8s resources via: <code>kubectl apply -f deployment/</code>');
-            }
-        },
-        {
-            delay: 13800,
-            action: () => {
-                stages.deploy.querySelector('.progress-fill').style.width = '60%';
-                addLogLine('ReplicaSet scaled: creating 3 healthy pod replicas...');
-                addLogLine('Pod k8s-portfolio-8991a successfully started.');
-                addLogLine('Pod k8s-portfolio-8991b successfully started.');
-            }
-        },
-        {
-            delay: 14800,
-            action: () => {
-                stages.deploy.querySelector('.progress-fill').style.width = '100%';
-                addLogLine('Configuring LoadBalancer ingress endpoint routes...');
-                addLogLine('Ingress health checks: [HEALTHY]');
-            }
-        },
-        {
-            delay: 15600,
-            action: () => {
-                stages.deploy.classList.remove('active');
-                stages.deploy.classList.add('success');
-                stages.deploy.querySelector('.stage-status').textContent = 'Deployed';
-                addLogLine('Deployment Rollout completed successfully!', 'text-success');
-                addLogLine('<span class="text-cyan">========================================================</span>');
-                addLogLine('<strong>APP RUNNING ON:</strong> <a href="#" style="color: var(--accent-cyan);">https://abhishek-sharma.devops</a>');
-                addLogLine('<span class="text-cyan">========================================================</span>');
+                flowSteps.verify.classList.add('active');
+                appendStdoutLine(`[VERIFY] Launching verification checks...`);
                 
-                // Pipeline complete
-                pipelineRunning = false;
-                runPipelineBtn.disabled = false;
-                pipelineStatusText.className = 'status-success';
-                pipelineStatusText.textContent = 'SUCCESS';
+                if (selectedSteps.includes('test')) {
+                    appendStdoutLine(`[VERIFY] Executing automated Jest/NUnit unit tests...`);
+                    appendStdoutLine(`[VERIFY] PASS: tests/health.spec.js (0.6s) | PASS: tests/auth.spec.js (1.1s)`);
+                } else {
+                    appendStdoutLine(`[VERIFY] Unit tests bypassed in configuration form.`);
+                }
+            }
+        },
+        {
+            delay: 6800,
+            action: () => {
+                if (selectedSteps.includes('scan')) {
+                    appendStdoutLine(`[VERIFY] Running Trivy container vulnerability scanner...`);
+                    appendStdoutLine(`[VERIFY] Result: 0 Vulnerabilities flagged (Critical: 0, High: 0).`);
+                }
+                
+                if (selectedSteps.includes('sonar')) {
+                    appendStdoutLine(`[VERIFY] Launching SonarQube static code quality analysis...`);
+                    appendStdoutLine(`[VERIFY] Gate status: [PASSED] (Code Coverage: 86.4%, Duplications: 0%).`);
+                }
+            }
+        },
+        {
+            delay: 7600,
+            action: () => {
+                flowSteps.verify.classList.remove('active');
+                flowSteps.verify.classList.add('success');
+                appendStdoutLine(`[VERIFY] Verification checks completed successfully. Quality gate passed.`, 'success');
+                // Animate connector 3
+                document.querySelectorAll('.flow-step-connector')[2].classList.add('active-conn');
+            }
+        },
+        // --- STEP 4: HOST ---
+        {
+            delay: 8400,
+            action: () => {
+                flowSteps.deploy.classList.add('active');
+                appendStdoutLine(`[HOST] Initiating rollout to orchestrator cluster...`);
+                
+                if (cloudDest === 'aws') {
+                    appendStdoutLine(`[HOST] Scaling ECS services tasks... allocating active pods...`);
+                } else {
+                    appendStdoutLine(`[HOST] Swapping slots traffic to azure app services production endpoint...`);
+                }
+            }
+        },
+        {
+            delay: 9600,
+            action: () => {
+                appendStdoutLine(`[HOST] Configuring load balancer ingress controller mapping...`);
+                appendStdoutLine(`[HOST] Traffic routes: [HEALTHY] status check verified.`);
+            }
+        },
+        {
+            delay: 10400,
+            action: () => {
+                flowSteps.deploy.classList.remove('active');
+                flowSteps.deploy.classList.add('success');
+                
+                const siteUrl = cloudDest === 'aws' ? 'http://aws-loadbalancer-142.ap-south-1.elb.amazonaws.com' : 'https://abhishek-app.azurewebsites.net';
+                appendStdoutLine(`[HOST] Deployment successful. Sandbox is fully operational.`, 'success');
+                appendStdoutLine(`-------------------------------------------------------------------------------------`);
+                appendStdoutLine(`ENDPOINT ACCESS URL: <a href="#" style="color: var(--accent-emerald); font-weight: bold;">${siteUrl}</a>`);
+                appendStdoutLine(`-------------------------------------------------------------------------------------`);
+                
+                sandboxRunning = false;
+                sandboxDeployBtn.disabled = false;
+                sandboxPipelineStatus.className = 'stdout-status success';
+                sandboxPipelineStatus.textContent = 'SUCCESS';
             }
         }
     ];
 
-    // Schedule all steps
-    timeline.forEach(step => {
+    // Trigger scheduled pipeline steps
+    pipelineSequence.forEach(step => {
         setTimeout(step.action, step.delay);
     });
 }
 
-runPipelineBtn.addEventListener('click', runPipelineSimulation);
-
-clearLogsBtn.addEventListener('click', () => {
-    if (pipelineRunning) return;
-    pipelineLogs.innerHTML = '<div class="log-line text-muted">[System] Ready to run build task. Waiting...</div>';
-});
+if (sandboxForm) {
+    sandboxForm.addEventListener('submit', runSandboxDeployment);
+}
 
 
 /* ==========================================================================
-   5. Interactive Infrastructure Map (Drop Shipping Project)
+   4. Interactive Blueprint Details (Drop Shipping Project)
    ========================================================================== */
-const infraNodes = document.querySelectorAll('.infra-node');
-const detailTitle = document.querySelector('.detail-node-title');
-const detailDesc = document.querySelector('.detail-node-desc');
-const tfCode = document.getElementById('terraform-code');
+const bpNodes = document.querySelectorAll('.bp-node');
+const bpSpecTitle = document.getElementById('bp-spec-title');
+const bpSpecDesc = document.getElementById('bp-spec-desc');
+const bpSpecTf = document.getElementById('bp-spec-tf');
+const copyTfBtn = document.getElementById('copy-tf-btn');
 
-// Node Information & Terraform Snippets database
-const nodeData = {
-    "node-alb": {
+// Blueprint resources details data mapping
+const bpNodeSpecs = {
+    alb: {
         title: "Application Load Balancer (ALB)",
         desc: "An AWS Application Load Balancer configured to handle external client web traffic. It termination TLS certificates and routes HTTP requests across two separate Availability Zones to instances inside Auto-Scaling groups, securing maximum application uptime.",
         tf: `resource "aws_lb" "web_alb" {
@@ -607,7 +636,7 @@ const nodeData = {
   }
 }`
     },
-    "node-ec2": {
+    ec2: {
         title: "EC2 Web & App Scaling Group",
         desc: "Web servers running on AWS EC2 instances, structured in Auto Scaling Groups across multiple Availability Zones. Scaling parameters automatically increase instance capacity when CPU utilization meets 75% or decrease capacity to conserve cost.",
         tf: `resource "aws_autoscaling_group" "web_asg" {
@@ -624,7 +653,7 @@ const nodeData = {
   }
 }`
     },
-    "node-rds": {
+    rds: {
         title: "RDS Multi-AZ Relational Database",
         desc: "A fully-managed Amazon RDS SQL Server instance configured inside private subnets for high security. Deployed with Multi-AZ configuration to automatically replicate transactions to a standby replica node in a separate zone for instant failover capability.",
         tf: `resource "aws_db_instance" "production_db" {
@@ -640,7 +669,7 @@ const nodeData = {
   skip_final_snapshot  = true
 }`
     },
-    "node-s3": {
+    s3: {
         title: "Amazon S3 Static Assets Storage",
         desc: "Simple Storage Service bucket that holds application media assets, logs, and static templates. Configured with strict IAM access policies, default server-side AES-256 encryption, and lifecycle policies that transition old logs to Glacier to minimize overhead cost.",
         tf: `resource "aws_s3_bucket" "assets_bucket" {
@@ -661,7 +690,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encrypt" {
   }
 }`
     },
-    "node-cw": {
+    cw: {
         title: "CloudWatch Operations Monitor",
         desc: "Amazon CloudWatch serves as the centralized logging and alerting hub. Deployed dashboards gather metrics from the ALB and Auto-Scaling groups, firing off SNS notifications to the operations support team when critical system spikes occur.",
         tf: `resource "aws_cloudwatch_metric_alarm" "cpu_utilization_high" {
@@ -679,71 +708,104 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encrypt" {
     }
 };
 
-// Bind click events to elements
-infraNodes.forEach(node => {
-    // Exclude the client node which is just a graphical source
-    if (node.id === 'node-client') return;
+bpNodes.forEach(node => {
+    if (node.id === 'bp-node-client') return;
 
     node.addEventListener('click', () => {
-        // Toggle highlight class
-        infraNodes.forEach(n => n.classList.remove('active-node'));
-        node.classList.add('active-node');
+        bpNodes.forEach(n => n.classList.remove('active-bp-node'));
+        node.classList.add('active-bp-node');
 
-        const key = node.id;
-        const data = nodeData[key];
+        const key = node.getAttribute('data-node');
+        const spec = bpNodeSpecs[key];
 
-        if (data) {
-            // Animate transition smoothly
-            const panel = document.getElementById('diagram-details');
+        if (spec) {
+            // Animate details reload smoothly
+            const panel = document.getElementById('bp-specs-panel');
             panel.style.opacity = 0.3;
             panel.style.transform = 'translateY(5px)';
-            
+
             setTimeout(() => {
-                detailTitle.textContent = data.title;
-                detailDesc.textContent = data.desc;
-                tfCode.textContent = data.tf;
+                bpSpecTitle.textContent = spec.title;
+                bpSpecDesc.textContent = spec.desc;
+                bpSpecTf.textContent = spec.tf;
                 
                 panel.style.opacity = 1;
                 panel.style.transform = 'translateY(0)';
-            }, 150);
+            }, 120);
         }
     });
 });
 
+// Copy terraform script button implementation
+if (copyTfBtn) {
+    copyTfBtn.addEventListener('click', () => {
+        const codeText = bpSpecTf.textContent;
+        navigator.clipboard.writeText(codeText).then(() => {
+            copyTfBtn.textContent = 'Copied!';
+            copyTfBtn.style.color = 'var(--accent-emerald)';
+            setTimeout(() => {
+                copyTfBtn.textContent = 'Copy code';
+                copyTfBtn.style.color = 'var(--accent-indigo)';
+            }, 2000);
+        }).catch(err => {
+            console.error('Copy code failed: ', err);
+        });
+    });
+}
+
 
 /* ==========================================================================
-   6. Contact Manifest Submission Simulation
+   5. Contact YAML Manifest Form Connection
    ========================================================================== */
-const contactForm = document.getElementById('contact-form');
-const formFeedback = document.getElementById('form-feedback-message');
+const contactForm = document.getElementById('manifest-contact-form');
+const formFeedback = document.getElementById('yaml-form-feedback');
+const submitBtn = document.getElementById('manifest-submit-btn');
 
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const submitBtn = contactForm.querySelector('.submit-manifest-btn');
-    const originalText = submitBtn.innerHTML;
-    
-    // Simulate deployment loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying...';
-    formFeedback.className = 'form-feedback';
-    formFeedback.style.display = 'none';
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying...';
+        formFeedback.className = 'yaml-form-feedback';
+        formFeedback.style.display = 'none';
 
-    setTimeout(() => {
-        // Mock successful deployment of manifest
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        
-        formFeedback.className = 'form-feedback success';
-        formFeedback.innerHTML = '<i class="fa-solid fa-check"></i> connectionrequest.v1.yaml applied successfully. Gateway response: Message delivered.';
-        formFeedback.style.display = 'block';
-        
-        // Reset inputs
-        contactForm.reset();
-        
-        // Auto fadeout notification
         setTimeout(() => {
-            formFeedback.style.display = 'none';
-        }, 6000);
-    }, 1800);
-});
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            
+            formFeedback.className = 'yaml-form-feedback success';
+            formFeedback.innerHTML = '<i class="fa-solid fa-check"></i> connectionrequest.v1.yaml successfully promoting state. Gateway status: message forwarded.';
+            formFeedback.style.display = 'block';
+            
+            contactForm.reset();
+            
+            setTimeout(() => {
+                formFeedback.style.display = 'none';
+            }, 6000);
+        }, 1500);
+    });
+}
+
+// Mobile toggle menu listener
+const mobileToggle = document.querySelector('.mobile-toggle');
+const navMenu = document.querySelector('.nav-menu');
+if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('open');
+        const icon = mobileToggle.querySelector('i');
+        if (navMenu.classList.contains('open')) {
+            icon.className = 'fa-solid fa-xmark';
+        } else {
+            icon.className = 'fa-solid fa-bars-staggered';
+        }
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('open');
+            mobileToggle.querySelector('i').className = 'fa-solid fa-bars-staggered';
+        });
+    });
+}
