@@ -77,6 +77,16 @@ const Pipelines = () => {
     setSteps(prev => prev.map(s => ({ ...s, status: 'idle' })));
   };
 
+  useEffect(() => {
+    const handleTrigger = () => {
+      startPipeline();
+    };
+    window.addEventListener('trigger-pipeline-sim', handleTrigger);
+    return () => {
+      window.removeEventListener('trigger-pipeline-sim', handleTrigger);
+    };
+  }, [isRunning, steps]);
+
   // Duration timer
   useEffect(() => {
     let timer: any;

@@ -1,218 +1,144 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './styles/Skills.css';
 
-type PodInfo = {
-  id: string;
-  name: string;
-  version: string;
-  desc: string;
-  logs: string;
+type LogLine = {
+  text: string;
+  type: 'input' | 'output' | 'error' | 'system';
 };
 
-const namespacePods: Record<string, PodInfo[]> = {
-  infra: [
-    {
-      id: "terraform",
-      name: "pod/terraform-operator",
-      version: "v1.6.2",
-      desc: "Declarative Infrastructure as Code (IaC) to construct repeatable resources. Built VPCs, EC2 instances, security rules, and databases cleanly without manual drift.",
-      logs: `[INFO] Initializing terraform provider plugins...
-[INFO] Terraform AWS provider: version v5.12.0 loaded.
-[INFO] State Backend: remote s3 storage (dropshipping-state-bucket) verified.
-[INFO] Refreshing terraform state mapping...
-[INFO] 40+ resources discovered in state file.
-[SUCCESS] State matches cloud records. 0 changes required.`
-    },
-    {
-      id: "aws",
-      name: "pod/aws-cloud-controller",
-      version: "v2026.1",
-      desc: "Expertise in core AWS service architectures: VPC subnets configuration, Route53 DNS management, Application Load Balancers (ALBs), and EC2 computing profiles.",
-      logs: `[INFO] Requesting IAM session credentials...
-[INFO] Identity authenticated: arn:aws:iam::88914022:user/abhishek
-[INFO] Querying subnet layouts inside ap-south-1...
-[INFO] Subnet ap-south-1a (Public): Active / CIDR 10.0.1.0/24
-[INFO] Subnet ap-south-1b (Private): Active / CIDR 10.0.10.0/24
-[INFO] Status: VPC network path routing validated.`
-    },
-    {
-      id: "azure",
-      name: "pod/azure-resource-manager",
-      version: "v3.85.0",
-      desc: "Deploying resources inside Azure App Services, configuring Storage Accounts, Blob containers, and SQL Server instances connected via Elastic Pools.",
-      logs: `[INFO] Authenticated with Azure Active Directory.
-[INFO] Active subscription: Prod-DevOps-Subscription (Active)
-[INFO] Checking app service hosts: 3 running workloads.
-[INFO] Azure App Service "production-web-host" reports 100% health check passes.
-[INFO] Storage accounts synced. 0 latency flags.`
-    }
-  ],
-  containers: [
-    {
-      id: "k8s",
-      name: "pod/kubernetes-service-controller",
-      version: "v1.28.4",
-      desc: "Managing container nodes clusters. Deploying Pod configs, setting Service interfaces, scaling deployment replicas, and monitoring operational pods status.",
-      logs: `[INFO] kubectl describe deployment web-app-deployment
-Name:                   web-app-deployment
-Namespace:              production-apps
-Replicas:               3 desired | 3 updated | 3 total | 3 available
-Conditions:             Available: True (MinimumReplicasAvailable)
-Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ---   ----                   -------
-  Normal  ScalingReplicaSet  12m   deployment-controller  Scaled replica set to 3`
-    },
-    {
-      id: "docker",
-      name: "pod/docker-runtime-engine",
-      version: "v24.0.9",
-      desc: "Constructing multi-stage optimized Dockerfiles to compress deployment base layers. Executing local testing containers and managing image releases registries.",
-      logs: `[INFO] docker build -t abhishek-portfolio:latest .
-Sending build context to Docker daemon  32.4MB
-Step 1/3 : FROM node:20-alpine AS builder -> Using cache
-Step 2/3 : COPY . . -> Done (0.8s)
-Step 3/3 : RUN npm run build -> Success (2.4s)
-Successfully built image: sha256:d892a01d44bc (124MB)`
-    },
-    {
-      id: "ghactions",
-      name: "pod/github-actions-runner",
-      version: "v2.312.0",
-      desc: "Designing secure GitHub actions YAML files. Setting permissions scopes, caches parameters, and deploying build artifacts onto target server endpoints.",
-      logs: `[INFO] Run actions/checkout@v4
-[INFO] Syncing git commit history to runner...
-[INFO] Run actions/setup-node@v4
-[INFO] Node environment setup completed: node v22.2.0
-[INFO] Run npm run build -> Build folder generated
-[SUCCESS] Uploading artifact dist/ ... Ready. Run completed.`
-    },
-    {
-      id: "jenkins",
-      name: "pod/jenkins-automation-server",
-      version: "v2.426.3",
-      desc: "Writing Jenkinsfile pipeline pipelines for automation build releases. Coordinating pipeline steps and executing shell commands on remote slaves.",
-      logs: `[INFO] Starting build task #142...
-[INFO] Checking out code from repository...
-[INFO] Stage: [Compile Dependencies] -> Executed successfully (12s)
-[INFO] Stage: [Unit Tests] -> All tests passing (18s)
-[SUCCESS] Pipeline finished status: SUCCESSful.`
-    }
-  ],
-  db: [
-    {
-      id: "sqlserver",
-      name: "pod/mssql-db-administrator",
-      version: "v15.0.2",
-      desc: "Production SQL Server administration. Automating backups, script queries executions, schema comparisons using Redgate, and migrating DB instances (bacpac).",
-      logs: `[INFO] DB admin instance connection active.
-[INFO] Executing scheduled database transaction log backup...
-[INFO] Backup operation: [SUCCESS] Saved to local storage blob.
-[INFO] Running database integrity checks (DBCC CHECKDB)...
-[SUCCESS] 0 allocation errors, 0 consistency errors found.`
-    },
-    {
-      id: "dbtools",
-      name: "pod/ssms-redgate-operator",
-      version: "v19.1.0",
-      desc: "Utilizing database administration utilities including SQL Server Management Studio (SSMS), Redgate SQL Compare, PGAdmin, and MongoDB Compass.",
-      logs: `[INFO] Running schema diff comparison with Redgate comparison tool...
-[INFO] Source Database: Development-Replica
-[INFO] Target Database: Production-Instance
-[INFO] Results: 2 stored procedures out of sync.
-[INFO] Generating deployment synchronisation script...
-[SUCCESS] Sync script generated. Ready for code promotion.`
-    },
-    {
-      id: "iis",
-      name: "pod/iis-web-host",
-      version: "v10.0",
-      desc: "Configuring IIS Web Server hosts, managing application pools, binding secure SSL certificates, and troubleshooting HTTP request issues.",
-      logs: `[INFO] Querying IIS application pool state...
-[INFO] AppPool "SimplifyAppPool": Status: RUNNING (PID: 20994)
-[INFO] Active SSL bindings: https://app.simplifyhealthcare.com (443)
-[INFO] CPU usage pool: 2.4% / Memory allocation: 512MB
-[INFO] Status check: OK`
-    }
-  ],
-  dev: [
-    {
-      id: "python",
-      name: "pod/python-runtime-3-11",
-      version: "v3.11.8",
-      desc: "Writing scripting tools in Python to automate log monitoring, audit server configurations, and develop Django API backend modules.",
-      logs: `[INFO] python --version -> Python 3.11.8
-[INFO] Running file script: audit_ports.py
-[INFO] Scanning system listening network ports...
-[WARNING] Port 8080 listening without firewall block.
-[INFO] Script generated firewall recommendation rule. Task complete.`
-    },
-    {
-      id: "dotnet",
-      name: "pod/dotnet-runtime",
-      version: "v8.0.0",
-      desc: "Understanding backend structures, deploying .NET API application pools, and troubleshooting IIS runtime issues.",
-      logs: `[INFO] dotnet --info
-.NET SDK version: 8.0.100
-[INFO] Restoring project dependencies...
-[INFO] Restored successfully. (1.2s)
-[INFO] Running code compilation: dotnet build -c Release
-[SUCCESS] 0 Errors, 0 Warnings.`
-    }
-  ],
-  monitoring: [
-    {
-      id: "siem",
-      name: "pod/siem-security-analyzer",
-      version: "v8.11.0",
-      desc: "Monitoring system security alerts, parsing system event logs, and identifying threat indicators to resolve production incidents proactively.",
-      logs: `[INFO] Connecting to SIEM event indexer gateway...
-[INFO] Active streams checked: 4 logs channels active.
-[INFO] Parsing event logs for patterns of security vulnerabilities...
-[INFO] Alert check: No brute force signatures detected.
-[SUCCESS] Cluster security assessment status: SAFE.`
-    },
-    {
-      id: "alerts",
-      name: "pod/azure-monitor-alerts",
-      version: "v1.12.0",
-      desc: "Configuring metrics alerting criteria for disk space thresholds, CPU exhaustion, and memory leaks. Directing alerts to support teams via GLPI/ITSM.",
-      logs: `[INFO] Querying monitor rules database...
-[INFO] Alert rule [DiskSpaceCritical]: Enabled (Threshold: 85% full)
-[INFO] Alert rule [CPUUtilizationHigh]: Enabled (Threshold: 80% for 5 mins)
-[INFO] Diagnostic probe active. Host disks capacity checked: 52% free.`
-        },
-    {
-      id: "prompting",
-      name: "pod/gpt-ai-assistant",
-      version: "v4.0.0",
-      desc: "Utilizing AI prompting techniques to brainstorm system designs, write script structures, and automate operational documentation.",
-      logs: `[INFO] AI prompt request received: "Generate modular terraform VPC template"
-[INFO] LLM completion response constructed (2.4s)
-[INFO] Generating terraform files structure...
-[INFO] Completed: main.tf, variables.tf, outputs.tf outputted.
-[SUCCESS] Template generated.`
-    }
-  ]
-};
+const commands: Record<string, () => string> = {
+  help: () => `Available commands:
+  whoami          - Brief overview profile of Abhishek Sharma
+  skills          - Detail of DevOps, Cloud & Development skills
+  projects        - Overview of provisioned AWS Drop Shipping project
+  experience      - Review work history at Simplify Healthcare
+  certifications  - List active course certifications (AZ-900, AWS, etc.)
+  pipeline        - Run the simulated CI/CD build & deploy pipeline
+  cat info.txt    - Display contact routes & endpoint details
+  clear           - Wipe terminal logs`,
 
-const friendlyNames: Record<string, string> = {
-  infra: "ns/cloud-infra",
-  containers: "ns/containers-ci-cd",
-  db: "ns/databases-admin",
-  dev: "ns/languages-it",
-  monitoring: "ns/monitoring-ai"
+  whoami: () => `guest@devops-node:~$ whoami
+NAME: Abhishek Sharma
+ROLE: DevOps Engineer
+PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure, application deployment, and system monitoring. Skilled in CI/CD pipelines, containerization (Docker, Kubernetes), and release management. Strong SQL Server database and production support experience.`,
+
+  skills: () => `guest@devops-node:~$ kubectl get skills -o wide
+CATEGORY             SKILLSET
+AWS                  EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer
+Azure                VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts
+DevOps / CI-CD       Terraform (IaC), Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
+Databases            SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server
+Languages & Dev      Python, C/C++, .Net, Django
+AI & ITSM            Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting`,
+
+  projects: () => `guest@devops-node:~$ terraform show -module=dropshipping
+MODULE: Project - Drop Shipping (AWS infrastructure)
+STATUS: Deployed successfully (Active)
+DESCRIPTION: Provisioned 40+ AWS services using modular Terraform from scratch.
+ARCHITECTURAL METRICS:
+  - 1 Virtual Private Cloud (VPC) with public/private subnetting.
+  - Multi-AZ Web Application Load Balancer (ALB) + EC2 Auto Scaling Groups.
+  - Secure SQL Relational Database (RDS Multi-AZ).
+  - CloudWatch metric monitoring & alarms integration.
+  - Cost optimized through custom pricing configurations.`,
+
+  experience: () => `guest@devops-node:~$ cat experience.log
+[01/2023 - Present] Simplify Healthcare - Associate Application Deployment Engineer
+PROJECT: Multi Project Environment
+TASKS DELIVERED:
+  * Managed container workloads on Docker & Kubernetes cluster nodes.
+  * Deployed apps onto Azure App Services; administered storage configurations.
+  * Administered SQL database jobs, Bacpac migrations, and backups.
+  * Configured SIEM and Azure Alerts mapping memory, CPU, and Disk metrics.
+  * Handled daily production deployments; troubleshoot pipeline blockers.`,
+
+  certifications: () => `guest@devops-node:~$ get-certifications
+ACTIVE BADGES:
+  - Generative AI Foundation (June 2025) - Microsoft & upGrad
+  - Microsoft Azure Fundamentals AZ-900 (October 2025)
+  - AWS Certification (March 2026) - Cloud&DevOpsHUB
+  - Cyber Security Tools & Attacks (August 2020) - Coursera
+  - MNA + CloudV2 (June 2019) - Jetking`,
+
+  "cat info.txt": () => `guest@devops-node:~$ cat info.txt
+ENDPOINT CONTACT ROUTES:
+  - Email:      as787145@gmail.com
+  - Phone:      +91 8308989160
+  - LinkedIn:   https://www.linkedin.com/in/as787145
+  - Github:     https://github.com/abhisheksharma (simulated)
+  - Cluster:    visitor-prod-1`,
+
+  pipeline: () => {
+    setTimeout(() => {
+      const el = document.getElementById('pipelines');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+      window.dispatchEvent(new Event('trigger-pipeline-sim'));
+    }, 500);
+    return `guest@devops-node:~$ npm run pipeline
+[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
+  }
 };
 
 const Skills = () => {
-  const [activeNs, setActiveNs] = useState('infra');
-  const pods = namespacePods[activeNs] || [];
-  const [activePod, setActivePod] = useState<PodInfo>(pods[0] || {});
+  const [history, setHistory] = useState<LogLine[]>([
+    { text: 'System session initialized. Welcome guest user.', type: 'system' },
+    { text: 'Type "help" to view the available commands in this terminal.', type: 'output' }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const terminalBodyRef = useRef<HTMLDivElement | null>(null);
 
-  const handleNsChange = (ns: string) => {
-    setActiveNs(ns);
-    const newPods = namespacePods[ns] || [];
-    setActivePod(newPods[0] || {});
+  useEffect(() => {
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
+  }, [history]);
+
+  const handleCommandRun = (cmdText: string) => {
+    const trimmed = cmdText.trim();
+    if (!trimmed) return;
+
+    const lower = trimmed.toLowerCase();
+
+    // 1. Add input command line to history
+    setHistory(prev => [...prev, { text: `guest@devops-node:~$ ${trimmed}`, type: 'input' }]);
+
+    // 2. Process command outputs
+    if (lower === 'clear') {
+      setHistory([
+        { text: 'System logs cleared. Session active.', type: 'system' }
+      ]);
+    } else if (commands[lower]) {
+      const output = commands[lower]();
+      setHistory(prev => [...prev, { text: output, type: 'output' }]);
+    } else if (lower === 'kubectl get nodes') {
+      const output = `guest@devops-node:~$ kubectl get nodes
+NAME             STATUS   ROLES    AGE   VERSION
+k8s-master-01    Ready    control  320d  v1.28.2
+k8s-worker-01    Ready    worker   320d  v1.28.2
+k8s-worker-02    Ready    worker   320d  v1.28.2`;
+      setHistory(prev => [...prev, { text: output, type: 'output' }]);
+    } else if (lower === 'terraform init') {
+      const output = `guest@devops-node:~$ terraform init
+Initializing the backend...
+Initializing provider plugins...
+- Finding hashicorp/aws versions >= 4.0.0...
+- Finding hashicorp/azurerm versions >= 3.0.0...
+Terraform has been successfully initialized!`;
+      setHistory(prev => [...prev, { text: output, type: 'output' }]);
+    } else {
+      const errorMsg = `bash: command not found: ${trimmed}. Type 'help' for options.`;
+      setHistory(prev => [...prev, { text: errorMsg, type: 'error' }]);
+    }
+
+    setInputValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCommandRun(inputValue);
+    }
   };
 
   return (
@@ -220,61 +146,52 @@ const Skills = () => {
       <div className="section-title-wrapper">
         <span className="sec-label">resource manager</span>
         <h3 className="sec-title">Cloud Infrastructure & Tech Stack</h3>
-        <p className="sec-desc">Explore the container namespaces containing my core DevOps tools, database skills, and platform competencies.</p>
+        <p className="sec-desc">Interact with the Command Console simulator to query my profile metadata, core skills database, or run deploy pipelines.</p>
       </div>
 
-      <div className="cluster-layout-card glass-panel">
-        <div className="cluster-namespaces">
-          <div className="namespace-header">NAMESPACES</div>
-          {Object.keys(namespacePods).map((nsKey) => (
-            <button
-              key={nsKey}
-              className={`ns-tab ${activeNs === nsKey ? 'active' : ''}`}
-              onClick={() => handleNsChange(nsKey)}
-            >
-              {friendlyNames[nsKey]}
-            </button>
-          ))}
+      {/* Terminal Command Console Simulator */}
+      <div className="terminal-console-wrapper glass-panel">
+        <div className="terminal-header">
+          <div className="terminal-dots">
+            <span className="dot dot-red"></span>
+            <span className="dot dot-yellow"></span>
+            <span className="dot dot-green"></span>
+          </div>
+          <div className="terminal-title">guest@devops-node: ~</div>
+          <div className="terminal-status">session: active</div>
         </div>
 
-        <div className="pods-view-panel">
-          <div className="panel-header">
-            <span className="current-namespace-title">
-              <i className="fa-solid fa-cube"></i> Namespace: {friendlyNames[activeNs]}
-            </span>
-            <span className="pod-count-badge">{pods.length} Pods Running</span>
+        <div className="terminal-body" ref={terminalBodyRef}>
+          {history.map((line, idx) => (
+            <div
+              key={idx}
+              className={`terminal-line ${line.type}`}
+              dangerouslySetInnerHTML={{ __html: line.text.replace(/\n/g, '<br>') }}
+            />
+          ))}
+          <div className="terminal-input-row">
+            <span className="terminal-prompt">guest@devops-node:~$</span>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="terminal-input"
+              placeholder="Type a command (e.g. 'help')..."
+              autoFocus
+            />
           </div>
+        </div>
 
-          <div className="pods-grid">
-            {pods.map((pod) => (
-              <div
-                key={pod.id}
-                className={`pod-card ${activePod.id === pod.id ? 'active-pod' : ''}`}
-                onClick={() => setActivePod(pod)}
-              >
-                <div className="pod-status">
-                  <span className="pod-dot"></span>
-                  <span className="pod-status-text">Running</span>
-                </div>
-                <h4 className="pod-name">{pod.name}</h4>
-                <span className="pod-version">{pod.version}</span>
-              </div>
+        <div className="terminal-presets">
+          <span className="presets-label">Quick Shell Shortcuts:</span>
+          <div className="presets-grid">
+            {['help', 'whoami', 'skills', 'projects', 'experience', 'certifications', 'clear'].map((cmd) => (
+              <button key={cmd} onClick={() => handleCommandRun(cmd)} className="preset-btn">
+                <i className="fa-solid fa-terminal"></i> {cmd}
+              </button>
             ))}
           </div>
-
-          {activePod.id && (
-            <div className="pod-console-logger">
-              <div className="console-bar">
-                <span className="console-tab-name">
-                  <i className="fa-solid fa-code"></i> kubectl logs {activePod.name}
-                </span>
-                <span className="console-timestamp">200 OK</span>
-              </div>
-              <div className="console-output-area">
-                {activePod.logs}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -297,8 +214,8 @@ const Skills = () => {
           </div>
 
           {/* Azure Platform */}
-          <div class="platform-item">
-            <div class="platform-logo-wrapper">
+          <div className="platform-item">
+            <div className="platform-logo-wrapper">
               <svg className="svg-logo" viewBox="0 0 100 100" fill="currentColor">
                 <path fill="#0089D6" d="M13,67L35,22L53,42L22,81L13,67Z"/>
                 <path fill="#00BCF2" d="M53,42L77,13L87,26L48,87L31,69L53,42Z"/>
@@ -309,8 +226,8 @@ const Skills = () => {
           </div>
 
           {/* Kubernetes */}
-          <div class="platform-item">
-            <div class="platform-logo-wrapper">
+          <div className="platform-item">
+            <div className="platform-logo-wrapper">
               <svg className="svg-logo" viewBox="0 0 100 100" fill="currentColor">
                 <path fill="#326CE5" d="M50,9.2L85.3,22V63.6L50,91.8L14.7,63.6V22L50,9.2Z M50,17.4L21.8,27.7V59.4L50,81.9L78.2,59.4V27.7L50,17.4Z"/>
                 <path fill="#326CE5" d="M50,30.3L64.1,44.4L50,58.5L35.9,44.4L50,30.3Z M50,36L41.6,44.4L50,52.8L58.4,44.4L50,36Z"/>
